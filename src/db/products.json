@@ -1,0 +1,92 @@
+[
+   {
+      "title": "mac",
+      "description": "computer",
+      "price": 1500,
+      "thumbnail": "Sin imagen",
+      "code": "a1",
+      "stock": 10,
+      "id": 1
+   },
+   {
+      "title": "iphone",
+      "description": "celular",
+      "price": 1000,
+      "thumbnail": "Sin imagen",
+      "code": "b2",
+      "stock": 20,
+      "id": 2
+   },
+   {
+      "title": "ipad",
+      "description": "tablet",
+      "price": 1400,
+      "thumbnail": "Sin imagen",
+      "code": "c3",
+      "stock": 15,
+      "id": 3
+   },
+   {
+      "title": "monitor",
+      "description": "monitor",
+      "price": 300,
+      "thumbnail": "Sin imagen",
+      "code": "d4",
+      "stock": 30,
+      "id": 4
+   },
+   {
+      "title": "auriculares",
+      "description": "auriculares",
+      "price": 50,
+      "thumbnail": "Sin imagen",
+      "code": "e5",
+      "stock": 100,
+      "id": 5
+   },
+   {
+      "title": "teclado",
+      "description": "teclado",
+      "price": 300,
+      "thumbnail": "Sin imagen",
+      "code": "f6",
+      "stock": 40,
+      "id": 6
+   },
+   {
+      "title": "mouse",
+      "description": "mouse",
+      "price": 100,
+      "thumbnail": "Sin imagen",
+      "code": "g7",
+      "stock": 40,
+      "id": 7
+   },
+   {
+      "title": "tv",
+      "description": "tv",
+      "price": 2000,
+      "thumbnail": "Sin imagen",
+      "code": "h8",
+      "stock": 8,
+      "id": 8
+   },
+   {
+      "title": "impresora",
+      "description": "impresora",
+      "price": 300,
+      "thumbnail": "Sin imagen",
+      "code": "i9",
+      "stock": 10,
+      "id": 9
+   },
+   {
+      "title": "joystick",
+      "description": "joystick",
+      "price": 100,
+      "thumbnail": "Sin imagen",
+      "code": "j10",
+      "stock": 20,
+      "id": 10
+   }
+]
