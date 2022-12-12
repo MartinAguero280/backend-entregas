@@ -35,7 +35,6 @@ export class ProductManager {
 
             
             if (productById) {
-                productById.id == id && console.log("El id que a introducido pertenece a este producto:", productById);
                 return productById
             } else {
                 console.log(`Not found (No hay producto que coincida con el id: ${id})`)
@@ -46,14 +45,14 @@ export class ProductManager {
         }
     }
 
-    addProduct = async ({title, description, price, thumbnail, code, stock}) => {
+    addProduct = async ({title, description, price, thumbnail, code, stock, status, category}) => {
         try {
 
             const response = await fs.promises.readFile(this.path, "utf-8");
             const jsonResponse = await JSON.parse(response);
             const IsInProductsBolean = await jsonResponse.some(producto => producto.code == code);
 
-            if (!title || !description || !price || !thumbnail || !code || !stock) {
+            if (!title || !description || !price || !code || !stock || !status || !category) {
                 return console.log("Las variables son obligatorias");
             } else if (IsInProductsBolean === true) {
                 return console.log("No se pueden repetir los productos")
@@ -66,6 +65,8 @@ export class ProductManager {
                 thumbnail,
                 code,
                 stock,
+                status,
+                category
             }
 
             const products = await this.getProducts();
@@ -99,7 +100,9 @@ export class ProductManager {
                 productsById.push(productById[0]); 
                 await fs.promises.writeFile(this.path, JSON.stringify(productsById, null, 3));
                 console.log(`El producto con el id: ${id} se a actualizado exitosamente`);
+                return productById
             }
+            
 
         } catch (error) {
             console.log("Error al actualizar un producto");
@@ -126,33 +129,3 @@ export class ProductManager {
     }
 
 }
-
-const products = new ProductManager(
-    "./src/db/products.json"
-);
-
-const testClass = async () => {
-
-    //const getProduct = await electronicProducts.getProducts();
-    //console.log(getProduct);
-
-    /*const addProduct = await products.addProduct({
-        title: "ipad",
-        description: "tablet",
-        price: 1400,
-        thumbnail: "Sin imagen",
-        code: "fff666",
-        stock: 15,
-    });
-    console.log(addProduct);*/
-
-    //const productById= await electronicProducts.getProductById(1);
-    //const productById2= await electronicProducts.getProductById(23);//error
-
-    //const updateProduct = await electronicProducts.updateProduct(2, "price", 200);
-
-    //const deleteProduct = await electronicProducts.deleteProduct(2);
-    //const deleteProduct2 = await electronicProducts.deleteProduct(12);//error
-};
-
-testClass();
