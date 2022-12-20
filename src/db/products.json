@@ -28,5 +28,25 @@
       "status": true,
       "category": "silla",
       "id": 3
+   },
+   {
+      "title": "ipad",
+      "description": "tablet ipad",
+      "price": 1500,
+      "code": "234234",
+      "stock": 10,
+      "status": true,
+      "category": "tablet",
+      "id": 4
+   },
+   {
+      "title": "asdfasdf",
+      "description": "bicicleta color rojo adulto",
+      "price": "200",
+      "code": "4567457",
+      "stock": "3",
+      "status": "true",
+      "category": "bicicleta",
+      "id": 5
    }
 ]

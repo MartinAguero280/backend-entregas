@@ -2,15 +2,31 @@ import express from "express";
 import fs from "fs";
 import {ProductManager} from "./Managers/ProductManager.js";
 import { CartsManager } from "./Managers/CartManager.js";
+import { Server as HttpServer } from 'http';
+import { Server as IOserver} from 'socket.io'
+import __dirname from "./utils.js";
+import handlebars from 'express-handlebars';
+import homeRouter from './routes/home.router.js'
 
 const productManager = new ProductManager("./src/db/products.json");
-const cartsManager = new CartsManager("./src/db/carts.json")
+const cartsManager = new CartsManager("./src/db/carts.json");
 
 const app = express();
-app.use(express.json())
-app.use( express.urlencoded({ectended: true}))
+const httpServer = new HttpServer(app);
+const io = new IOserver(httpServer);
+
+
+app.use(express.json());
+app.use( express.urlencoded({extended: true}));
 
 const port = 8080;
+
+app.engine('handlebars', handlebars.engine());
+app.set('views', __dirname + '/views');
+app.set('view engine', 'handlebars');
+
+
+
 
 
 //Products
@@ -191,4 +207,19 @@ app.post("/api/carts/:idc/product/:idp", async (req, res) => {
 });
 
 
-app.listen(port, () => console.log(`server running on port ${port}`))
+//handlebars
+
+app.use(express.static(__dirname + '/public'));
+app.use('/', homeRouter);
+app.use('/realtimeproducts', homeRouter);
+
+io.on("connection", async socket => {
+    console.log("New client conected id:" + socket.id);
+
+    const products = await productManager.getProducts();
+    io.sockets.emit("products", products)
+})
+
+
+
+const server = httpServer.listen(port, () => console.log(`server running on port ${port}`));

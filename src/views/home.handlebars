@@ -1,0 +1,37 @@
+<div>
+    <h2>Products</h2>
+    <hr>
+    {{#each products}}
+
+        <div style="display: flex; flex-direction: row; align-items: center; gap: 0.3rem; border: 1px solid black;">
+            <h4>Title:</h4>
+            <p>{{this.title}}</p><br><br>
+
+            <h4>Description:</h4>
+            <p>{{this.description}}</p><br><br>
+
+            <h4>price:</h4>
+            <p>{{this.price}}</p><br><br>
+
+            <h4>Code:</h4>
+            <p>{{this.code}}</p><br><br>
+
+            <h4>Stock:</h4>
+            <p>{{this.stock}}</p><br><br>
+
+            <h4>Status:</h4>
+            <p>{{this.status}}</p><br><br>
+
+            <h4>Category:</h4>
+            <p>{{this.category}}</p><br><br>
+
+            <h4>Id:</h4>
+            <p>{{this.id}}</p><br><br>
+        </div>
+        
+    {{/each}}
+
+</div>
+
+
+
