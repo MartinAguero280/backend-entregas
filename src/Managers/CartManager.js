@@ -32,7 +32,7 @@ export class CartsManager {
         const cart = {
             products: [
                 
-            ],
+            ]
         }
 
         const carts = await this.getCarts();
