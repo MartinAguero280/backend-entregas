@@ -1,5 +1,4 @@
 import express from "express";
-import fs from "fs";
 import {ProductManager} from "./Managers/ProductManager.js";
 import { CartsManager } from "./Managers/CartManager.js";
 import { Server as HttpServer } from 'http';
@@ -10,6 +9,7 @@ import homeRouter from './routes/home.router.js';
 import mongoose from "mongoose";
 import { productsModel } from "./models/products.model.js";
 import { cartsModel } from "./models/carts.model.js";
+import { chatModel } from "./models/chat.model.js";
 
 
 const productManager = new ProductManager("./src/db/products.json");
@@ -228,14 +228,28 @@ app.post("/api/carts/:idc/product/:idp", async (req, res) => {
 });
 
 
+// Chat
 
+let messages = [];
 
 io.on("connection", async socket => {
     console.log("New client conected id:" + socket.id);
 
-    const products = await productManager.getProducts();
+    const products = await productsModel.find({});
     io.sockets.emit("products", products)
+    
+    // Escucha los mensajes de un usuario
+    socket.on("message", data => {
+
+        // Guarda el mensage
+        messages.push(data);
+
+        //Emite el mensaje para los demas usuarios
+        io.emit("messageLogs", messages)
+        chatModel.create(data)
+    })
 })
+
 
 // Coneccion a DB Mongo Atlas
 mongoose.set('strictQuery', false);
