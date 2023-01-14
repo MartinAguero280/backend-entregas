@@ -1,15 +1,15 @@
 import express from "express";
-import {ProductManager} from "./Managers/ProductManager.js";
-import { CartsManager } from "./Managers/CartManager.js";
+import {ProductManager} from "./dao/managers/ProductManager.js";
+import { CartsManager } from "./dao/managers/CartManager.js";
 import { Server as HttpServer } from 'http';
 import { Server as IOserver} from 'socket.io'
 import __dirname from "./utils.js";
 import handlebars from 'express-handlebars';
 import homeRouter from './routes/home.router.js';
 import mongoose from "mongoose";
-import { productsModel } from "./models/products.model.js";
-import { cartsModel } from "./models/carts.model.js";
-import { chatModel } from "./models/chat.model.js";
+import { productsModel } from "./dao/models/products.model.js";
+import { cartsModel } from "./dao/models/carts.model.js";
+import { chatModel } from "./dao/models/chat.model.js";
 
 
 const productManager = new ProductManager("./src/db/products.json");
@@ -59,7 +59,7 @@ app.get("/api/products", async (req, res) => {
     }
 });
 
-// Mostrar ub producto segun su id
+// Mostrar un producto segun su id
 app.get("/api/products/:id", async (req, res) => {
     try {
         const {id} = req.params;
