@@ -1,0 +1,55 @@
+{{#if isValid}}
+<div>
+    <h2>Products</h2>
+    <hr>
+
+    <div>
+        <nav aria-label="Page navigation example" style="font-weight: bold;">
+            <ul class="pagination">
+                
+                <li class="page-item"><a class="page-link" {{#if hasPrevPage}}href="{{prevLink}}"{{/if}}>Prev</a></li>
+                
+                <p class="page-link" style="color: black;">{{page}}</p>
+                
+                <li class="page-item"><a class="page-link" {{#if hasNextPage}}href="{{nextLink}}"{{/if}}>Next</a></li>
+                
+            </ul>
+        </nav>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="cool">Title</th>
+                <th scope="cool">Description</th>
+                <th scope="cool">Price</th>
+                <th scope="cool">Code</th>
+                <th scope="cool">Stock</th>
+                <th scope="cool">Status</th>
+                <th scope="cool">Category</th>
+                <th scope="cool">button</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {{#each docs}}
+            <tr>
+                <th scope="row"> {{this.title}} </th>
+                <th> {{this.description}} </th>
+                <th> {{this.price}} </th>
+                <th> {{this.code}} </th>
+                <th> {{this.stock}} </th>
+                <th> {{this.status}} </th>
+                <th> {{this.category}} </th>
+                <th> <button id="AddToCartButton" class="btn btn-primary">Add to cart</button> </th>
+            </tr>
+            {{/each}}
+        </tbody>
+
+    </table>
+</div>
+{{else}}
+<h2>No Products</h2>
+{{/if}}
+
+<script src="js/products.js"></script>

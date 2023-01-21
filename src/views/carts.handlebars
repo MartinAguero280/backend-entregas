@@ -1,0 +1,37 @@
+
+<h1>Carrito segun el id ingresado</h1>
+
+<table class="table">
+        <thead>
+            <tr>
+                <th scope="cool">Title</th>
+                <th scope="cool">Description</th>
+                <th scope="cool">Price</th>
+                <th scope="cool">Code</th>
+                <th scope="cool">Stock</th>
+                <th scope="cool">Status</th>
+                <th scope="cool">Category</th>
+                <th scope="cool">Quantity</th>
+            </tr>
+        </thead>
+
+        <tbody class="tbodyProducts">
+            {{#each products}}
+                {{#with product}}
+                <tr>
+                    <th scope="row"> {{title}} </th>
+                    <th> {{description}} </th>
+                    <th> {{price}} </th> 
+                    <th> {{code}} </th>
+                    <th> {{stock}} </th>
+                    <th> {{status}} </th>
+                    <th> {{category}} </th>
+                {{/with}}
+                    <th> {{this.quantity}} </th>
+                </tr>
+                
+            {{/each}}
+        </tbody>
+
+    </table>
+</div>

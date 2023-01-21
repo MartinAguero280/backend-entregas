@@ -8,30 +8,15 @@ const createProductForm = document.getElementById("createProductForm")
 socket.on("products", (products) => {
     
     const allProductsElements = products.map((products) => `
-    <h4>Title</h4>
-    <p>${products.title}</p><br>
-
-    <h4>Description</h4>
-    <p>${products.description}</p><br>
-
-    <h4>price</h4>
-    <p>${products.price}</p><br>
-
-    <h4>Code</h4>
-    <p>${products.code}</p><br>
-
-    <h4>Stock</h4>
-    <p>${products.stock}</p><br>
-
-    <h4>Status</h4>
-    <p>${products.status}</p><br>
-
-    <h4>Category</h4>
-    <p>${products.category}</p><br>
-
-    <h4>Id:</h4>
-    <p>${products.id}</p><br>
-    <hr>
+    <tr>
+        <th scope="row"> ${products.title} </th>
+        <th> ${products.description} </th>
+        <th> ${products.price} </th>
+        <th> ${products.code} </th>
+        <th> ${products.stock} </th>
+        <th> ${products.status} </th>
+        <th> ${products.category} </th>
+    </tr>
     `)
     .join(" ");
 
