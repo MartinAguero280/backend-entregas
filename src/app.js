@@ -20,6 +20,9 @@ const app = express();
 const httpServer = new HttpServer(app);
 const io = new IOserver(httpServer);
 
+app.use(express.static(__dirname + '/public'));
+app.use('/', homeRouter, productsRouter, cartsRouter);
+app.use('/realtimeproducts', homeRouter);
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -31,9 +34,7 @@ app.engine('handlebars', handlebars.engine());
 app.set('views', __dirname + '/views');
 app.set('view engine', 'handlebars');
 
-app.use(express.static(__dirname + '/public'));
-app.use('/', homeRouter, productsRouter, cartsRouter);
-app.use('/realtimeproducts', homeRouter);
+
 
 
 // Chat
