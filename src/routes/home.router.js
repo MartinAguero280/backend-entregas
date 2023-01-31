@@ -3,7 +3,9 @@ import express from "express";
 const router = express.Router();
 
 router.get('/', async (req, res) => { 
-    res.render('home')
+    if (req.session?.user) return res.render('home');
+
+    return res.redirect('sessions/login')
 });
 
 router.get('/realtimeproducts', (req, res) => {

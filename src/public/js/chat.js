@@ -13,7 +13,7 @@ swal.fire({
     allowOutsideClick: false
 }).then(result => {
     user = result.value
-    let txtUserName = document.getElementById("username");
+    let txtUserName = document.getElementById("username"); 
     txtUserName.innerHTML = user;
     socket.emit("authenticated", user)
 });

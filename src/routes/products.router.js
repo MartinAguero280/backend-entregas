@@ -1,5 +1,7 @@
 import express from "express";
 import { productsModel } from "../dao/models/products.model.js";
+// Authentication
+import { auth } from './sessions.router.js'
 
 const router = express.Router();
 
@@ -18,7 +20,7 @@ router.get("/api/products", async (req, res) => {
 });
 
 // Mostrar view con todos los productos
-router.get("/products", async (req, res) => {
+router.get("/products", auth, async (req, res) => {
 
     try {
 
@@ -55,11 +57,14 @@ router.get("/products", async (req, res) => {
         result.prevLink = result.hasPrevPage ? `/products?page=${result.prevPage}&limit=${limit}&query=${filter}&sort=${sort}` : "";
         result.nextLink = result.hasNextPage ? `/products?page=${result.nextPage}&limit=${limit}&query=${filter}&sort=${sort}` : "";
         result.isValid = !(page <= 0 || page > result.totalPages || isNaN(page));
+        result.user = req.session.user
+        result.rol = req.session.rol
+
 
         res.render('products', result)
 
-    } catch (error) {
-        console.log("Error al traer los productos");
+    } catch (error) { 
+        console.log("Error al traer los productos", error);
     }
 });
 
