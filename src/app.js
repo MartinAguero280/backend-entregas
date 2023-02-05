@@ -18,8 +18,13 @@ import sessionsRouter from './routes/sessions.router.js';
 import { productsModel } from "./dao/models/products.model.js";
 import { chatModel } from "./dao/models/chat.model.js";
 // Express session
-import session from "express-session";
+import session from "express-session"; 
 import MongoStore from "connect-mongo";
+// Passport
+import passport from 'passport';
+// InitializePassport 
+import initializePassport from "./config/passport.config.js";
+
 
 
 // Express
@@ -37,13 +42,17 @@ app.use(session({
             useNewUrlParser: true,
             useUnifiedTopology: true
         },
-        ttl: 30
+        ttl: 100
     }),
     secret: 'secretsecret',
     resave: true,
     saveUninitialized: true
 }))
 
+// Inicializar Passport
+initializePassport();
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(express.static(__dirname + '/public'));
 app.use('/', homeRouter, productsRouter, cartsRouter);
@@ -83,7 +92,6 @@ io.on("connection", async socket => {
 
 
 // Coneccion a DB Mongo Atlas
-//const mongoUri = "mongodb+srv://adminProducts:bFyK3kj1FvRcNmlC@cluster0.v16gk5m.mongodb.net/?retryWrites=true&w=majority";
 mongoose.set('strictQuery', false);
 mongoose.connect(mongoUri, error => {
     if (error) {

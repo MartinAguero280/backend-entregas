@@ -1,16 +1,32 @@
+// Express
 import express from "express";
+// Models
 import { sessionsModel } from "../dao/models/sessions.model.js";
+// Bcrypt
+import bcrypt from 'bcrypt';
+// Passport
+import passport from "passport";
 
 
 const router = express.Router();
 router.use(express.json());
 router.use(express.urlencoded({extended: true}));
 
+
+// Authentication function
 export function auth(req, res, next) {
     if (req.session?.user) return next();
 
-    return res.status(401).render("errors/error", {error: "No autenticado,logueate para ver esta página"})
+    return res.status(401).render("errors/error", {error: "No autenticado, logueate para ver esta página"})
 }
+
+// Hashear password
+export const encryptPassword = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+
+// Comparar passwords 
+export const comparePassword = (password, encryptedPassword) => {
+    return bcrypt.compareSync(password, encryptedPassword)
+};
 
 
 // Sessions
@@ -21,9 +37,27 @@ router.get("/login", async (req, res) => {
 });
 
 // Login
-router.post("/login", async (req, res) => {
+router.post("/login", passport.authenticate('login', { failureDirect: '/session/faillogin' }), async (req, res) => {
 
     try {
+
+        const {email} = req.body
+
+        req.session.user = email;
+
+        req.session.rol = "user"
+
+        if (email == "adminCoder@coder.com") {
+            req.session.rol = "admin"
+        }
+
+        res.redirect("/products")
+
+    } catch (error) {
+        console.log(error);
+    }
+
+    /*try {
 
         const { email, password } = req.body;
 
@@ -31,17 +65,21 @@ router.post("/login", async (req, res) => {
             return res.status(401).render('errors/error', { error: 'Error: Valores incompletos' })
         }
 
-        const session = await sessionsModel.findOne({email, password});
+        const user = await sessionsModel.findOne({email});
 
-        if (!session) {
-            return res.status(401).render('errors/error', { error: 'User y/o password incorrectos' })
+        if (!user) {
+            return res.status(401).render('errors/error', { error: 'Error: User inexistente' })
+        }
+
+        if (!comparePassword(password, user.password)) {
+            return res.status(403).render('errors/error', { error: 'Error: Contraseña incorrecta' })
         }
 
         req.session.user = email;
 
         req.session.rol = "user"
 
-        if (email == "adminCoder@coder.com" && password == "adminCod3r123") {
+        if (email == "adminCoder@coder.com") {
             req.session.rol = "admin"
         }
 
@@ -49,8 +87,14 @@ router.post("/login", async (req, res) => {
 
     } catch (error) {
         console.log("Error al traer los productos");
-    }
+    }*/
 });
+
+// Fail login
+router.get("/faillogin", async (req, res) => {
+    res.render('error/errors', { error: 'Login error' })
+});
+
 
 // View register
 router.get("/register", async (req, res) => {
@@ -58,11 +102,19 @@ router.get("/register", async (req, res) => {
 });
 
 // Register
-router.post("/register", async (req, res) => {
-    
+router.post("/register", passport.authenticate('register', { failureDirect: '/session/failregister' }), async (req, res) => {
+
     try {
+        res.redirect('/sessions/login')
+    } catch (error) {
+        console.log('ERROR:', error);
+    }
+
+    /*try {
         const {email, password} = req.body;
+
         const newUser = req.body;
+        newUser.password = encryptPassword(newUser.password);
 
         if (email.length <= 0 || password.length <= 0) {
             return res.status(401).render('errors/error', { error: 'Error: Valores incompletos' })
@@ -80,8 +132,14 @@ router.post("/register", async (req, res) => {
 
     } catch (error) {
         console.log("ERROR", error);
-    }
+    }*/
 });
+
+// Fail register
+router.get("/failregister", async (req, res) => {
+    res.render('error/errors', { error: 'Register error' })
+});
+
 
 //Logout
 router.get("/logout", async (req, res) => {

@@ -19,7 +19,7 @@ router.get("/api/products", async (req, res) => {
     }
 });
 
-// Mostrar view con todos los productos
+// View Products
 router.get("/products", auth, async (req, res) => {
 
     try {
