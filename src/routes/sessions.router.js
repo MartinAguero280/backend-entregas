@@ -1,7 +1,5 @@
 // Express
 import express from "express";
-// Models
-import { sessionsModel } from "../dao/models/sessions.model.js";
 // Bcrypt
 import bcrypt from 'bcrypt';
 // Passport
@@ -95,6 +93,17 @@ router.get("/faillogin", async (req, res) => {
     res.render('error/errors', { error: 'Login error' })
 });
 
+// Login Github
+router.get('/login-github', passport.authenticate('github', {scope: ['user: email']}), async(req, res) => {})
+// Github callback
+router.get('/githubcallback', passport.authenticate('github', {failureRedirect: '/login'}), async(req, res) => {
+    req.session.user = req.user.email;
+    req.session.rol = 'user';
+    if (req.session.user == "adminCoder@coder.com") {
+        req.session.rol = "admin"
+    }
+    res.redirect('/products')
+})
 
 // View register
 router.get("/register", async (req, res) => {

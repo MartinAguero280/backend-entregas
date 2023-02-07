@@ -3,6 +3,7 @@ import passport from 'passport';
 import local from 'passport-local';
 import { sessionsModel } from '../dao/models/sessions.model.js';
 import { encryptPassword, comparePassword } from '../routes/sessions.router.js';
+import GitHubStrategy from 'passport-github2';
 
 
 const localStrategy = local.Strategy;
@@ -66,6 +67,42 @@ const initializePassport = () => {
             }
         }
     ))
+
+    passport.use('github', new GitHubStrategy(
+        {
+            clientID: 'Iv1.0bf69778ed8c1652',
+            clientSecret: '6efc246dc08c8eea64db61b50e5afb3b861a89a9',
+            callbackURL: 'http://localhost:8080/sessions/githubcallback'
+        },
+        async(accessToken, refreshToken, profile, done) => {
+
+            
+
+            try {
+                //profile._json.email = 'perro@perro.com';
+                console.log(profile._json.email);
+                const user = await sessionsModel.findOne({email: profile._json.email});
+
+                if (user) {
+                    return done(null, user)
+                };
+
+                const newUser = {
+                    email: profile._json.email,
+                    password: ''
+                };
+
+                const result = await sessionsModel.create(newUser);
+
+                return done(null, result)
+
+            } catch (error) {
+                return done('Error al loguearse con Github' + error)
+            }
+        }
+    ))
+
+
 
     passport.serializeUser((user, done) => {
         done(null,user._id)
