@@ -14,7 +14,9 @@ const initializePassport = () => {
             passReqToCallback: true, usernameField: 'email'
         },
         async (req, username, password, done) => {
+            
 
+            const {name, lastname, age} = req.body;
 
             try {
                 // Sin funcionar
@@ -28,6 +30,9 @@ const initializePassport = () => {
                 }
 
                 const newUser = {
+                    first_name: name,
+                    last_name: lastname,
+                    age,
                     email: username,
                     password: encryptPassword(password)
                 }
@@ -79,8 +84,8 @@ const initializePassport = () => {
             
 
             try {
-                //profile._json.email = 'perro@perro.com';
-                console.log(profile._json.email);
+                profile._json.email = 'perro@perro.com';
+                console.log(profile);
                 const user = await sessionsModel.findOne({email: profile._json.email});
 
                 if (user) {
@@ -88,8 +93,11 @@ const initializePassport = () => {
                 };
 
                 const newUser = {
+                    first_name: profile._json.name,
+                    last_name: '',
+                    age: '',
                     email: profile._json.email,
-                    password: ''
+                    password: '',
                 };
 
                 const result = await sessionsModel.create(newUser);

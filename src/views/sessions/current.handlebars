@@ -1,0 +1,27 @@
+<div>
+    <h2>User information</h2>
+    <h3>Bienvenido {{this.user.first_name}}</h3><i><a href="/sessions/logout"><button type="button" class="btn btn-danger">Logout</button></a></i>
+    <hr>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="cool">First name</th>
+                <th scope="cool">Last name</th>
+                <th scope="cool">Age</th>
+                <th scope="cool">Email</th>
+                <th scope="cool">Role</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <th scope="row"> {{this.user.first_name}} </th>
+                <th> {{this.user.last_name}} </th>
+                <th> {{this.user.age}} </th>
+                <th> {{this.user.email}} </th>
+                <th> {{this.user.role}} </th>
+            </tr>
+        </tbody>
+    </table>
+</div>

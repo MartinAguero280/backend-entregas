@@ -57,9 +57,8 @@ router.get("/products", auth, async (req, res) => {
         result.prevLink = result.hasPrevPage ? `/products?page=${result.prevPage}&limit=${limit}&query=${filter}&sort=${sort}` : "";
         result.nextLink = result.hasNextPage ? `/products?page=${result.nextPage}&limit=${limit}&query=${filter}&sort=${sort}` : "";
         result.isValid = !(page <= 0 || page > result.totalPages || isNaN(page));
-        result.user = req.session.user
-        result.rol = req.session.rol
-
+        result.user = req.session.user.first_name;
+        result.rol = req.session.user.role;
 
         res.render('products', result)
 
