@@ -3,8 +3,8 @@ import express from "express";
 // Servers
 import { Server as HttpServer } from 'http';
 import { Server as IOserver} from 'socket.io'
-// Dirname
-import __dirname from "./utils.js";
+// Ruta absoluta
+import { __dirname } from "./utils.js";
 // Handlebars
 import handlebars from 'express-handlebars';
 // Mongoose
@@ -22,8 +22,11 @@ import session from "express-session";
 import MongoStore from "connect-mongo";
 // Passport
 import passport from 'passport';
-// InitializePassport 
 import initializePassport from "./config/passport.config.js";
+// Cookie parser
+import cookieParser from "cookie-parser";
+// Config
+import { port, mongoUri, sessionSecret, sessionName } from "./config/config.js";
 
 
 
@@ -32,27 +35,31 @@ const app = express();
 const httpServer = new HttpServer(app);
 const io = new IOserver(httpServer);
 
+// Cookie parser
+app.use(cookieParser());
+
 // Express session 
-const mongoUri = "mongodb+srv://adminProducts:bFyK3kj1FvRcNmlC@cluster0.v16gk5m.mongodb.net/?retryWrites=true&w=majority";
 app.use(session({
     store: MongoStore.create({
         mongoUrl: mongoUri,
-        dbName: "sessions",
+        dbName: sessionName,
         mongoOptions: {
             useNewUrlParser: true,
             useUnifiedTopology: true
         },
         ttl: 100
     }),
-    secret: 'secretsecret',
+    secret: sessionSecret,
     resave: true,
     saveUninitialized: true
 }))
 
-// Inicializar Passport
+
+// Passport
 initializePassport();
 app.use(passport.initialize());
 app.use(passport.session());
+
 
 app.use(express.static(__dirname + '/public'));
 app.use('/', homeRouter, productsRouter, cartsRouter);
@@ -62,7 +69,6 @@ app.use('/realtimeproducts', homeRouter);
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-const port = 8080;
 
 //handlebars
 app.engine('handlebars', handlebars.engine());
@@ -71,7 +77,6 @@ app.set('view engine', 'handlebars');
 
 // Chat
 let messages = [];
-
 io.on("connection", async socket => {
     console.log("New client conected id:" + socket.id);
 

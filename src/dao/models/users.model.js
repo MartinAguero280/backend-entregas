@@ -1,10 +1,15 @@
 import mongoose from "mongoose";
+// Utils
+import { comparePassword } from "../../utils.js";
+// Config
+import { adminEmail, adminPassword } from '../../config/config.js'
+
 
 // Nombre de la coleccion
-const sessionsCollection = 'users';
+const usersCollection = 'users';
 
 // Esquema del documento
-const sessionsSchema = new mongoose.Schema({
+const usersSchema = new mongoose.Schema({
     first_name: String,
     last_name: String,
     email: {
@@ -24,13 +29,14 @@ const sessionsSchema = new mongoose.Schema({
 
 });
 
+
 // Condicional de roles
-sessionsSchema.pre('save', function(next) {
-    if (this.email === 'adminCoder@coder.com') {
+usersSchema.pre('save', function(next) {
+    if (this.email === adminEmail && comparePassword(adminPassword, this.password)) {
         this.role = 'admin';
     }
     next();
 });
 
 // Creacion del modelo. Collection + Schema
-export const sessionsModel = mongoose.model(sessionsCollection, sessionsSchema);
+export const usersModel = mongoose.model(usersCollection, usersSchema);

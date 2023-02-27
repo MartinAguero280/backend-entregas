@@ -1,30 +1,37 @@
-
+// Passport
 import passport from 'passport';
 import local from 'passport-local';
-import { sessionsModel } from '../dao/models/sessions.model.js';
-import { encryptPassword, comparePassword } from '../routes/sessions.router.js';
+// Utils
+import { encryptPassword, comparePassword, generateToken, authToken} from '../utils.js';
+// Github
 import GitHubStrategy from 'passport-github2';
+// JWT
+import jwt from 'passport-jwt';
+// Config
+import { jwtCookieName, jwtPrivateKey, githubClientId, githubClientSecret, githubCallBackUrl, adminEmail, adminPassword } from '../config/config.js'
+// Controller
+import UsersController from '../controllers/user.controller.js';
+const usersController = new UsersController();
 
 
 const localStrategy = local.Strategy;
 
+const JWTStrategy = jwt.Strategy;
+const ExtractJWT = jwt.ExtractJwt;
+
 const initializePassport = () => {
+
     passport.use('register', new localStrategy(
         {
             passReqToCallback: true, usernameField: 'email'
         },
         async (req, username, password, done) => {
-            
 
             const {name, lastname, age} = req.body;
 
             try {
-                // Sin funcionar
-                if (username.length <= 0 || password.length <= 0) {
-                    return done('Campos incompletos', false)
-                }
 
-                const user = await sessionsModel.findOne({email: username});
+                const user = await usersController.findOne({email: username});// cambio
                 if (user) {
                     return done('Usuario ya existe', false)
                 }
@@ -37,7 +44,7 @@ const initializePassport = () => {
                     password: encryptPassword(password)
                 }
 
-                const result = await sessionsModel.create(newUser);
+                const result = await usersController.create(newUser);// cambio
 
                 return done(null, result)
 
@@ -51,12 +58,8 @@ const initializePassport = () => {
         { usernameField: 'email' },
         async(username, password, done) => {
             try {
-                // Sin funcionar
-                if (username.length <= 0 || password.length <= 0) {
-                    return done('Campos incompletos', false)
-                }
 
-                const user = await sessionsModel.findOne({email: username});
+                const user = await usersController.findOne({email: username});//cambio
                 if (!user) {
                     return done('Usuario no registrado', false)
                 }
@@ -64,6 +67,8 @@ const initializePassport = () => {
                 if (!comparePassword(password, user.password)) {
                     return done('La contraseña es incorrecta', false)
                 }
+
+                user.token = generateToken(user);
 
                 return done(null, user)
 
@@ -73,26 +78,35 @@ const initializePassport = () => {
         }
     ))
 
+    passport.use('jwt', new JWTStrategy({
+        jwtFromRequest: ExtractJWT.fromExtractors([req => (req && req.cookies) ? req.cookies[jwtCookieName] : null]),
+        secretOrKey: jwtPrivateKey
+    }, async (jwt_payload, done) => {
+        done(null, jwt_payload)
+    }))
+
     passport.use('github', new GitHubStrategy(
         {
-            clientID: 'Iv1.0bf69778ed8c1652',
-            clientSecret: '6efc246dc08c8eea64db61b50e5afb3b861a89a9',
-            callbackURL: 'http://localhost:8080/sessions/githubcallback'
+            clientID: githubClientId,
+            clientSecret: githubClientSecret,
+            callbackURL: githubCallBackUrl
         },
         async(accessToken, refreshToken, profile, done) => {
 
             
 
             try {
+
                 profile._json.email = 'perro@perro.com';
-                console.log(profile);
-                const user = await sessionsModel.findOne({email: profile._json.email});
+
+                const user = await usersController.findOne({email: profile._json.email});
 
                 if (user) {
+                    user.token = generateToken(user);
                     return done(null, user)
                 };
 
-                const newUser = {
+                user = {
                     first_name: profile._json.name,
                     last_name: '',
                     age: '',
@@ -100,9 +114,11 @@ const initializePassport = () => {
                     password: '',
                 };
 
-                const result = await sessionsModel.create(newUser);
+                const result = await usersController.create(user);
 
-                return done(null, result)
+                user.token = generateToken(user);
+
+                return done(null, user)
 
             } catch (error) {
                 return done('Error al loguearse con Github' + error)
@@ -115,9 +131,8 @@ const initializePassport = () => {
     passport.serializeUser((user, done) => {
         done(null,user._id)
     })
-
     passport.deserializeUser(async (id, done) => {
-        const user = await sessionsModel.findById(id);
+        const user = await usersController.findById(id);
         done(null, user)
     })
 };

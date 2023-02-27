@@ -1,15 +1,17 @@
+// Express
 import express from "express";
+// Models
 import { cartsModel } from "../dao/models/carts.model.js";
 import { productsModel } from "../dao/models/products.model.js";
-// Authentication
-import { auth } from './sessions.router.js'
+// jwt auth
+import { passportCall } from "../utils.js";
 
 const router = express.Router();
 
 // Cart
 
 // View carts segun su id
-router.get("/carts/:id", auth, async (req, res) => {
+router.get("/carts/:id",  passportCall('jwt'), async (req, res) => {
 
     try {
 

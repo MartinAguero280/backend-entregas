@@ -1,7 +1,9 @@
+// Express
 import express from "express";
+// Model
 import { productsModel } from "../dao/models/products.model.js";
-// Authentication
-import { auth } from './sessions.router.js'
+// jwt auth
+import { passportCall } from "../utils.js";
 
 const router = express.Router();
 
@@ -20,7 +22,7 @@ router.get("/api/products", async (req, res) => {
 });
 
 // View Products
-router.get("/products", auth, async (req, res) => {
+router.get("/products", passportCall('jwt'), async (req, res) => {
 
     try {
 
@@ -57,8 +59,8 @@ router.get("/products", auth, async (req, res) => {
         result.prevLink = result.hasPrevPage ? `/products?page=${result.prevPage}&limit=${limit}&query=${filter}&sort=${sort}` : "";
         result.nextLink = result.hasNextPage ? `/products?page=${result.nextPage}&limit=${limit}&query=${filter}&sort=${sort}` : "";
         result.isValid = !(page <= 0 || page > result.totalPages || isNaN(page));
-        result.user = req.session.user.first_name;
-        result.rol = req.session.user.role;
+        result.user = req.user.user.first_name;
+        result.rol = req.user.user.role;
 
         res.render('products', result)
 

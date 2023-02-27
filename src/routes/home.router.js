@@ -1,9 +1,10 @@
 import express from "express";
+import { passportCall } from "../utils.js";
 
 const router = express.Router();
 
-router.get('/', async (req, res) => { 
-    if (req.session?.user) return res.render('home');
+router.get('/', passportCall('jwt'), async (req, res) => { 
+    //if (req.session?.user) return res.render('home');
     return res.redirect('sessions/login')
 });
 
