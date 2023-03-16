@@ -15,8 +15,8 @@ import productsRouter from './routes/products.router.js';
 import cartsRouter from './routes/carts.router.js';
 import sessionsRouter from './routes/sessions.router.js';
 // Models
-import { productsModel } from "./dao/models/products.model.js";
-import { chatModel } from "./dao/models/chat.model.js";
+import { productModel } from "./dao/mongo/models/product.model.js";
+import { chatModel } from "./dao/mongo/models/chat.model.js";
 // Express session
 import session from "express-session"; 
 import MongoStore from "connect-mongo";
@@ -34,6 +34,9 @@ import { port, mongoUri, sessionSecret, sessionName } from "./config/config.js";
 const app = express();
 const httpServer = new HttpServer(app);
 const io = new IOserver(httpServer);
+
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 
 // Cookie parser
 app.use(cookieParser());
@@ -54,7 +57,6 @@ app.use(session({
     saveUninitialized: true
 }))
 
-
 // Passport
 initializePassport();
 app.use(passport.initialize());
@@ -65,9 +67,6 @@ app.use(express.static(__dirname + '/public'));
 app.use('/', homeRouter, productsRouter, cartsRouter);
 app.use('/sessions', sessionsRouter);
 app.use('/realtimeproducts', homeRouter);
-
-app.use(express.json());
-app.use(express.urlencoded({extended: true}));
 
 
 //handlebars
@@ -80,7 +79,7 @@ let messages = [];
 io.on("connection", async socket => {
     console.log("New client conected id:" + socket.id);
 
-    const products = await productsModel.find({});
+    const products = await productModel.find({});
     io.emit("products", products)
     
     // Escucha los mensajes de un usuario

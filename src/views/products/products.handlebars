@@ -1,7 +1,10 @@
 {{#if isValid}}
 <div>
     <h2>Products</h2>
-    <h3>Bienvenido <a href="/sessions/current"> {{user}} </a>, su rol es: {{rol}} </h3><i><a href="/sessions/logout"><button type="button" class="btn btn-danger">Logout</button></a></i>
+    <h3>Bienvenido <a href="/sessions/current"> {{user.first_name}} </a>, su rol es: {{user.role}} </h3><i><a href="/sessions/logout"><button type="button" class="btn btn-danger">Logout</button></a></i>
+    {{#if admin}}
+    <i><a href="/products/create"><button type="button" class="btn btn-primary">Create Product</button></a></i>
+    {{/if}}
     <hr>
 
     <div>

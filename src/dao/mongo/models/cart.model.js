@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 
 // Nombre de la coleccion
-const cartsCollection = 'carts';
+const cartCollection = 'carts';
 
 // Esquema del documento
-const cartsSchema = new mongoose.Schema({
+const cartSchema = new mongoose.Schema({
     products: {
         type: [
             {
@@ -19,10 +19,10 @@ const cartsSchema = new mongoose.Schema({
     }
 });
 
-cartsSchema.pre('find', function() {
+cartSchema.pre('find', function() {
     this.populate('products.product')
 });
 
 
 // Creacion del modelo. Collection + Schema
-export const cartsModel = mongoose.model(cartsCollection, cartsSchema);
+export const cartModel = mongoose.model(cartCollection, cartSchema);

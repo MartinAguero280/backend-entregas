@@ -22,7 +22,6 @@ export function auth(req, res, next) {
     return res.status(401).render("errors/error", {error: "No autenticado, logueate para ver esta página"})
 }
 
-
 // bcrypt
 // Hashear password
 export const encryptPassword = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
@@ -62,4 +61,36 @@ export const passportCall = (strategy) => {
             next()
         })(req, res, next)
     }
+}
+
+// role authorization system
+export function requireRole(role) {
+    return (req, res, next) => {
+
+    if (req.user.user.role === 'admin') {
+        return next();
+    }
+    if (!req.user.user || req.user.user.role !== role) {
+        return res.status(401).render('errors/error', {error: 'You do not have access to this page'});
+    }
+    return next();
+    };
+}
+
+// Generate random string function
+export function generateRandomString() {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    for (let i = 0; i < 3; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
+
+// Date
+export function getCreatedAt() {
+    const now = new Date();
+    return now;
+
 }

@@ -1,24 +1,30 @@
 // Express
 import express from "express";
-// Models
-import { cartsModel } from "../dao/models/carts.model.js";
-import { productsModel } from "../dao/models/products.model.js";
+// Nodemailer
+import nodemailer from 'nodemailer'
 // jwt auth
 import { passportCall } from "../utils.js";
+// Controllers
+import CartController from "../controllers/cart.controller.js";
+import ProductController from "../controllers/product.controller.js";
+import TicketController from "../controllers/ticket.controller.js"
 
 const router = express.Router();
+const Cart = new CartController;
+const Product = new ProductController;
+const Ticket = new TicketController;
 
-// Cart
+
+// Cart 
 
 // View carts segun su id
-router.get("/carts/:id",  passportCall('jwt'), async (req, res) => {
+router.get("/carts/:id", passportCall('jwt'), async (req, res) => {
 
     try {
 
         const idc = req.params.id;
 
-        const cartById = await cartsModel.find({_id: idc}).lean();
-
+        const cartById = await Cart.find({_id: idc});
         const productsInCartById = cartById[0].products;
 
         res.render("carts", {products: productsInCartById});
@@ -28,7 +34,7 @@ router.get("/carts/:id",  passportCall('jwt'), async (req, res) => {
 });
 
 // Crear carrito
-router.post("/api/carts", async (req, res) => {
+router.post("/api/carts", passportCall('jwt'), async (req, res) => {
 
     const cart = {
         products: [
@@ -36,7 +42,7 @@ router.post("/api/carts", async (req, res) => {
         ],
     }
 
-    const newCart = await cartsModel.create({cart});
+    const newCart = await Cart.create({cart});
 
 
     if (!newCart) {
@@ -46,10 +52,10 @@ router.post("/api/carts", async (req, res) => {
 });
 
 // Mostrar todos los carritos
-router.get("/api/carts", async (req, res) => {
+router.get("/api/carts", passportCall('jwt'), async (req, res) => {
 
     try {
-        const allCarts = await cartsModel.find();
+        const allCarts = await Cart.find();
 
         const {limit} = req.query
         if (!limit || limit < 1) {
@@ -65,13 +71,13 @@ router.get("/api/carts", async (req, res) => {
 });
 
 // Mostrar carrito segun su id
-router.get("/api/carts/:id", async (req, res) => {
+router.get("/api/carts/:id", passportCall('jwt'), async (req, res) => {
 
     try {
         const {id} = req.params;
 
-        const cart = await cartsModel.findOne({_id: id});
-        console.log(JSON.stringify(cart, null, "\t"));
+        const cart = await Cart.findOne({_id: id});
+        //console.log(JSON.stringify(cart, null, "\t"));
 
         res.send({status: "succes", cart})
 
@@ -82,7 +88,7 @@ router.get("/api/carts/:id", async (req, res) => {
 });
 
 // Agregar productos segun su id a los carritos segun su id
-router.post("/api/carts/:idc/product/:idp", async (req, res) => {
+router.post("/api/carts/:idc/product/:idp", passportCall('jwt'), async (req, res) => {
     try {
 
         const idc = req.params.idc;
@@ -92,11 +98,11 @@ router.post("/api/carts/:idc/product/:idp", async (req, res) => {
             return res.send({error: "Los id tienen que ser válidos"})
         };
 
-        const productById = await productsModel.find({_id: idp});
-        const cartById = await cartsModel.find({_id: idc});
+        const productById = await Product.find({_id: idp});
+        const cartById = await Cart.find({_id: idc});
 
         const isInCartBoolean = cartById[0].products.some(product => product.product._id == idp);
-        console.log(cartById[0].products);
+        //console.log(cartById[0].products);
 
         if (isInCartBoolean) {
 
@@ -107,7 +113,7 @@ router.post("/api/carts/:idc/product/:idp", async (req, res) => {
             cartById[0].products = newProductsNoId;
             cartById[0].products.push(productId);
 
-            const result = await cartsModel.replaceOne({_id: idc}, cartById[0])
+            const result = await Cart.replaceOne({_id: idc}, cartById[0])
 
             return res.send({status: "succes", result})
         }
@@ -116,7 +122,7 @@ router.post("/api/carts/:idc/product/:idp", async (req, res) => {
 
         cartById[0].products.push({product: productById[0]._id, quantity: productById.quantity})
 
-        const result = await cartsModel.replaceOne({_id: idc}, cartById[0])
+        const result = await Cart.replaceOne({_id: idc}, cartById[0])
 
         res.send({status: "succes", result})
 
@@ -126,7 +132,7 @@ router.post("/api/carts/:idc/product/:idp", async (req, res) => {
 });
 
 // Eliminar productos segun su id del carrito seleccionado segun su id
-router.delete("/api/carts/:idc/product/:idp", async (req, res) => {
+router.delete("/api/carts/:idc/product/:idp", passportCall('jwt'), async (req, res) => {
     try {
         const {idc, idp} = req.params;
 
@@ -134,21 +140,13 @@ router.delete("/api/carts/:idc/product/:idp", async (req, res) => {
             return res.send({error: "Los id tienen que ser válidos"})
         };
 
-        const cartById = await cartsModel.findOne({_id: idc});
+        const cartById = await Cart.findOne({_id: idc});
 
         const newproducts = cartById.products.filter( products => products.product != idp );
 
-        const result = await cartsModel.updateOne({_id: idc}, {$set: {products: newproducts}})
+        const result = await Cart.updateOne({_id: idc}, {$set: {products: newproducts}})
 
         res.send({status: "succes", result})
-
-        //Error
-        //const result = await cartsModel.updateOne({_id: idc}, {$pull: {products: {id: idp}}});
-        /*const result = cartsModel.findOneAndUpdate(
-            { _id: idc },
-            { $pull: { products: { id: idp } } },
-            { new: true }
-        );*/
 
     } catch (error) {
         res.send({status: "error", error: "id de carrito o id de producto incorrectos"})
@@ -156,14 +154,14 @@ router.delete("/api/carts/:idc/product/:idp", async (req, res) => {
 });
 
 // Actualizar un carrito forsosamente por lo que contenga el body
-router.put("/api/carts/:id", async (req, res) => {
+router.put("/api/carts/:id", passportCall('jwt'), async (req, res) => {
 
     try {
         const id = req.params.id;
 
         const elementUpdated = req.body;
 
-        const result = await cartsModel.updateOne({_id: id}, elementUpdated);
+        const result = await Cart.updateOne({_id: id}, elementUpdated);
 
         res.send({status: "succes", result})
     } catch (error) {
@@ -172,7 +170,7 @@ router.put("/api/carts/:id", async (req, res) => {
 });
 
 // Actualizar solo la cantidad de ejemplares del producto
-router.put("/api/carts/:idc/product/:idp", async (req, res) => {
+router.put("/api/carts/:idc/product/:idp", passportCall('jwt'), async (req, res) => {
 
     try {
 
@@ -184,7 +182,7 @@ router.put("/api/carts/:idc/product/:idp", async (req, res) => {
             return res.send({error: "Los id tienen que ser válidos"})
         };
 
-        const cartById = await cartsModel.findOne({_id: idc});
+        const cartById = await Cart.findOne({_id: idc});
 
         const productById = cartById.products.find( product => product.product == idp);
         productById.quantity = quantityUpdated;
@@ -192,21 +190,10 @@ router.put("/api/carts/:idc/product/:idp", async (req, res) => {
         const products = cartById.products.filter( product => product.product != idp);
         products.push(productById)
 
-        const result = await cartsModel.updateOne({_id: idc}, {$set: {products: products}})
+        const result = await Cart.updateOne({_id: idc}, {$set: {products: products}})
 
         res.send({status: "succes", result})
 
-        //ERROR
-        //const result = await cartsModel.updateOne({_id: idc, "products.$.id": idp}, {$set: {"products.$.quantity": quantityUpdated}});
-
-        //const result = await cartsModel.updateOne({_id: idc}, {$set: {"products[0].quantity": quantityUpdated}}, {arrayFilters: [{"products[0].id": idp}]});
-
-        //const result = await cartsModel.findOneAndUpdate({_id: idc, "products.id": idp}, {$set: {"products[0].quantity": quantityUpdated}});
-
-        /*const result = await cartsModel.updateOne(
-            { _id: idc, "products": { $elemMatch: { "id": idp } } },
-            { $set: { "products.quantity": quantityUpdated } }
-        )*/
 
     } catch (error) {
         res.send({status: "error", error: "Error al actualizar el quantity de un producto dentro de un carrito"})
@@ -214,7 +201,7 @@ router.put("/api/carts/:idc/product/:idp", async (req, res) => {
 });
 
 // Eliminar todos los productos de un carrito según su id
-router.delete("/api/carts/:id", async (req, res) => {
+router.delete("/api/carts/:id", passportCall('jwt'), async (req, res) => {
     try {
         const id = req.params.id;
 
@@ -222,7 +209,7 @@ router.delete("/api/carts/:id", async (req, res) => {
             return res.send({error: "El id tienen que ser válidos"})
         };
         
-        const result = await cartsModel.updateOne({_id: id}, { $set: { products: [] }});
+        const result = await Cart.updateOne({_id: id}, { $set: { products: [] }});
 
 
         res.send({status: "succes", result})
@@ -232,5 +219,101 @@ router.delete("/api/carts/:id", async (req, res) => {
     }
 
 });
+
+// Finalizar compra de carrito segun su id
+router.post("/carts/:id/purchase", passportCall('jwt'), async( req, res) => {
+    try {
+        
+        const idc = req.params.id;
+
+        const cartById = await Cart.find({_id: idc});
+
+        let total = 0;
+        let productsRegected = []
+        let newCart = []
+
+        for (const cartProduct of cartById[0].products) {
+            const product = await Product.findById(cartProduct.product._id);
+
+            if (cartProduct.quantity > product.stock) {
+                productsRegected.push(cartProduct.product)
+            }
+
+            if (product.stock >= cartProduct.quantity) total += product.price * cartProduct.quantity || 0;
+            const newStock = product.stock < cartProduct.quantity ? product.stock : product.stock - cartProduct.quantity; 
+
+            const updateProduct = await Product.findOneAndUpdate(
+                { title: product.title }, 
+                { stock: newStock },
+                { new: true }
+            );
+        }
+
+        const productsWithoutStock = cartById[0].products.filter(product => productsRegected.includes(product.product));
+        const productsWithStock = cartById[0].products.filter(product => !productsRegected.includes(product.product));
+
+        if (total === 0) {
+            return res.send({status: "error", error: 'No se pudo realizar la compra por falta de stock en los siguientes productos', products: productsWithoutStock})
+        }
+
+        const ticket = {
+            purchaser: req.user.user.email,
+            amount: total,
+        }
+
+        const createTicket = await Ticket.create(ticket);
+
+        const cartUpdated = await Cart.updateOne({_id: idc}, {$set: {products: productsWithoutStock}})
+
+        const transport = nodemailer.createTransport({
+            service: 'gmail',
+            port: 587,
+            auth: {
+                user: '',
+                pass: ''
+            }
+        })
+
+        const mail = await transport.sendMail({
+            from: '',
+            to: '',
+            subject: 'ManoniMotoRep Tienda Online',
+            html: `
+                <div>
+                    <h1>ManoniMotoRep Tienda Online</h1>
+
+                    <h2>Gracias por su compra ${createTicket.purchaser}</h2>
+
+                    <h3>Ticket de compra</h3>
+
+                    
+                    <h4>Productos:</h4>
+                    <ul>
+                        ${productsWithStock.map(product => `<li>Nombre: ${product.product.title} - Precio: $${product.product.price} - Cantidad: ${product.quantity}</li>`).join("")}
+                    </ul>
+                    <h4>Total: $${createTicket.amount} </h4>
+
+                    <h4>Productos que no se pudieron comprar por falta de stock:</h4>
+                    ${productsWithoutStock.length > 0 ? 
+                        `<ul>
+                            ${productsWithoutStock.map(product => `<li>Nombre: ${product.product.title} - Precio: $${product.product.price} - Cantidad: ${product.quantity}</li>`).join("")}
+                        </ul>` :
+                        `<p>No hay productos sin stock.</p>`
+                    }
+                </div>
+            `,
+            attachments: []
+        })
+
+        if (productsRegected.length > 0) {
+            return res.send({status:'succes', messsage:'Falta de stock en los siguientes productos', products: productsWithoutStock})
+        }
+
+        res.send({status: "succes", message: 'Compra realizada exitosamente'})
+
+    } catch (error) {
+        res.send({error: 'Ocurrio un error al realizar la compra'})
+    }
+})
 
 export default router

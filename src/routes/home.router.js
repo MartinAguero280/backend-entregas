@@ -4,15 +4,14 @@ import { passportCall } from "../utils.js";
 const router = express.Router();
 
 router.get('/', passportCall('jwt'), async (req, res) => { 
-    //if (req.session?.user) return res.render('home');
-    return res.redirect('sessions/login')
+    res.render('home')
 });
 
-router.get('/realtimeproducts', (req, res) => {
-    res.render('realTimeProducts');
+router.get('/realtimeproducts',passportCall('jwt'), (req, res) => {
+    res.render('products/realTimeProducts');
 });
 
-router.get('/chat', (req, res) => {
+router.get('/chat',passportCall('jwt'), (req, res) => {
     res.render('chat');
 });
 

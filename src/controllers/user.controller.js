@@ -1,25 +1,23 @@
-import UsersService from "../service/users.service.js";
+import { UserService } from "../repositories/index.js";
 
-class UsersController {
+export default class UserController {
     constructor() {
-        this.usersService = new UsersService();
+        this.UserService = UserService;
     }
 
     create = async (u) => {
-        return this.usersService.create(u)
+        return this.UserService.create(u)
     }
 
     find = async () => {
-        return this.usersService.find();
+        return this.UserService.find();
     }
 
     findOne = async (c) => {
-        return this.usersService.findOne(c);
+        return this.UserService.findOne(c);
     }
 
     findById = async (id) => {
-        return this.usersService.findById(id)
+        return this.UserService.findById(id)
     }
 }
-
-export default UsersController

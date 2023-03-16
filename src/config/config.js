@@ -2,6 +2,9 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Persistence
+export const persistence = process.env.PERSISTENCE;
+
 // Port
 export const port = process.env.PORT;
 

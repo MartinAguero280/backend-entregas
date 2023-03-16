@@ -18,7 +18,7 @@ export class ProductManager {
         }
     }
 
-    getProducts = async () => {
+    find = async () => {
         try {
             const response = await fs.promises.readFile(this.path, "utf-8");
             return JSON.parse(response);
@@ -27,7 +27,7 @@ export class ProductManager {
         }
     }
 
-    getProductById = async (id) => {
+    findById = async (id) => {
         try {
             const response = await fs.promises.readFile(this.path, "utf-8");
             const jsonResponse = await JSON.parse(response);
@@ -45,14 +45,14 @@ export class ProductManager {
         }
     }
 
-    addProduct = async ({title, description, price, thumbnail, code, stock, status, category}) => {
+    create = async ({title, description, price, stock, category}) => {
         try {
 
             const response = await fs.promises.readFile(this.path, "utf-8");
             const jsonResponse = await JSON.parse(response);
             const IsInProductsBolean = await jsonResponse.some(producto => producto.code == code);
 
-            if (!title || !description || !price || !code || !stock || !status || !category) {
+            if (!title || !description || !price || !stock || !category) {
                 return console.log("Las variables son obligatorias");
             } else if (IsInProductsBolean === true) {
                 return console.log("No se pueden repetir los productos")
@@ -62,18 +62,13 @@ export class ProductManager {
                 title,
                 description,
                 price,
-                thumbnail,
-                code,
                 stock,
-                status,
                 category
             }
 
             const products = await this.getProducts();
 
-            product.id = !products.length ?
-                1 :
-                products[products.length - 1].id + 1;
+            product.id = !products.length ? 1 : products[products.length - 1].id + 1;
 
             products.push(product);
 
@@ -86,7 +81,7 @@ export class ProductManager {
         }
     }
 
-    updateProduct = async (id, campo, value) => {
+    update = async (id, campo, value) => {
         try {
 
             const response = await fs.promises.readFile(this.path, "utf-8");
@@ -109,7 +104,7 @@ export class ProductManager {
         }
     }
 
-    deleteProduct = async (id) => {
+    delete = async (id) => {
         try {
             const response = await fs.promises.readFile(this.path, "utf-8");
             const newPath = await JSON.parse(response);

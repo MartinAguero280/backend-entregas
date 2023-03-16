@@ -1,0 +1,48 @@
+<div class="container" style="display: flex; justify-content: center; align-items: center; flex-direction: column; ">
+
+    <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Create product</p>
+
+    <form class="mx-1 mx-md-4" id="createProduct-form" action="/products/create" method="post"> 
+
+        <div class="d-flex flex-row align-items-center mb-4">
+            <div class="form-outline flex-fill mb-0">
+                <input type="text" id="form3Example3c" class="form-control" name="title" />
+                <label class="form-label" for="form3Example3c" id="createProduct-title">Title</label>
+            </div>
+        </div>
+
+        <div class="d-flex flex-row align-items-center mb-4">
+            <div class="form-outline flex-fill mb-0">
+                <input type="text" id="form3Example3c" class="form-control" name="description" />
+                <label class="form-label" for="form3Example3c" id="createProduct-description">Description</label>
+            </div>
+        </div>
+
+        <div class="d-flex flex-row align-items-center mb-4">
+            <div class="form-outline flex-fill mb-0">
+                <input type="number" id="form3Example3c" class="form-control" name="price" min="0"/>
+                <label class="form-label" for="form3Example3c" id="createProduct-price">Price</label>
+            </div>
+        </div>
+
+        <div class="d-flex flex-row align-items-center mb-4">
+            <div class="form-outline flex-fill mb-0">
+                <input type="number" id="form3Example3c" class="form-control" name="stock" />
+                <label class="form-label" for="form3Example3c" id="createProduct-stock">Stock</label>
+            </div>
+        </div>
+
+        <div class="d-flex flex-row align-items-center mb-4">
+            <div class="form-outline flex-fill mb-0">
+                <input type="text" id="form3Example4c" class="form-control" name="category"/>
+                <label class="form-label" for="form3Example4c" id="createProduct-category">Category</label>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+            <input type="submit" class="btn btn-primary btn-lg" value="Create">
+        </div>
+
+    </form>
+
+</div>

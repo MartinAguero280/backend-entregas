@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 // Utils
-import { comparePassword } from "../../utils.js";
+import { comparePassword } from "../../../utils.js";
 // Config
-import { adminEmail, adminPassword } from '../../config/config.js'
+import { adminEmail, adminPassword } from '../../../config/config.js'
 
 
 // Nombre de la coleccion
@@ -39,4 +39,4 @@ usersSchema.pre('save', function(next) {
 });
 
 // Creacion del modelo. Collection + Schema
-export const usersModel = mongoose.model(usersCollection, usersSchema);
+export const userModel = mongoose.model(usersCollection, usersSchema);

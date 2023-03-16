@@ -5,7 +5,9 @@ import passport from "passport";
 // JWT
 import { jwtCookieName } from '../config/config.js'
 // Passport call
-import { passportCall } from "../utils.js";
+import { requireRole, passportCall } from "../utils.js";
+// DTO
+import UserDTO from "../dao/DTO/user.dto.js";
 
 
 const router = express.Router();
@@ -78,8 +80,8 @@ router.get("/failregister", async (req, res) => {
 
 
 // Current
-router.get("/current", passportCall('jwt'), async (req, res) => {
-    const user = req.user.user;
+router.get("/current", passportCall('jwt'), requireRole('user'), async (req, res) => {
+    const user = new UserDTO(req.user.user);
     res.render('sessions/current', { user })
 })
 

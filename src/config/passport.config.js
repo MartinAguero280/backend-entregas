@@ -10,8 +10,8 @@ import jwt from 'passport-jwt';
 // Config
 import { jwtCookieName, jwtPrivateKey, githubClientId, githubClientSecret, githubCallBackUrl, adminEmail, adminPassword } from '../config/config.js'
 // Controller
-import UsersController from '../controllers/user.controller.js';
-const usersController = new UsersController();
+import UserController from '../controllers/user.controller.js';
+const User = new UserController();
 
 
 const localStrategy = local.Strategy;
@@ -31,7 +31,7 @@ const initializePassport = () => {
 
             try {
 
-                const user = await usersController.findOne({email: username});// cambio
+                const user = await User.findOne({email: username});// cambio
                 if (user) {
                     return done('Usuario ya existe', false)
                 }
@@ -44,7 +44,7 @@ const initializePassport = () => {
                     password: encryptPassword(password)
                 }
 
-                const result = await usersController.create(newUser);// cambio
+                const result = await User.create(newUser);// cambio
 
                 return done(null, result)
 
@@ -59,7 +59,7 @@ const initializePassport = () => {
         async(username, password, done) => {
             try {
 
-                const user = await usersController.findOne({email: username});//cambio
+                const user = await User.findOne({email: username});//cambio
                 if (!user) {
                     return done('Usuario no registrado', false)
                 }
@@ -85,6 +85,23 @@ const initializePassport = () => {
         done(null, jwt_payload)
     }))
 
+    passport.use('current', new localStrategy(
+        { usernameField: 'email' },
+    async (username, password, done) => {
+
+        const user = await User.findOne({email: username});
+
+        if (!user) {
+            return done('Usuario no registrado', false)
+        }
+
+        if (!comparePassword(password, user.password)) {
+            return done('La contraseña es incorrecta', false)
+        }
+
+        done(null, user)
+    }))
+
     passport.use('github', new GitHubStrategy(
         {
             clientID: githubClientId,
@@ -99,7 +116,7 @@ const initializePassport = () => {
 
                 profile._json.email = 'perro@perro.com';
 
-                const user = await usersController.findOne({email: profile._json.email});
+                const user = await User.findOne({email: profile._json.email});
 
                 if (user) {
                     user.token = generateToken(user);
@@ -114,7 +131,7 @@ const initializePassport = () => {
                     password: '',
                 };
 
-                const result = await usersController.create(user);
+                const result = await User.create(user);
 
                 user.token = generateToken(user);
 
@@ -132,7 +149,7 @@ const initializePassport = () => {
         done(null,user._id)
     })
     passport.deserializeUser(async (id, done) => {
-        const user = await usersController.findById(id);
+        const user = await User.findById(id);
         done(null, user)
     })
 };
