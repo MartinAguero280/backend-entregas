@@ -6,6 +6,11 @@ import { productModel } from "../dao/mongo/models/product.model.js";
 import { requireRole, passportCall } from "../utils.js";
 // Product controller
 import ProductController from "../controllers/product.controller.js";
+// Custom Errors
+import CustomError from "../services/errors/custom_errors.js";
+import EErrors from "../services/errors/enums.js";
+import { createProductInfo } from "../services/errors/info.js";
+
 
 const router = express.Router();
 const Product = new ProductController();
@@ -78,10 +83,20 @@ router.get("/products/create", passportCall('jwt'), requireRole('admin'), async(
 });
 
 // Create Product
-router.post("/products/create",passportCall('jwt'), async(req, res) => {
+router.post("/products/create",passportCall('jwt'), requireRole('admin'), async(req, res) => {
     try {
 
     const newProduct = req.body;
+    const { title, description, price, stock, category } = req.body;
+
+    if (!title || !description || !price || !stock || !category) {
+        return CustomError.createError({
+            name: "Product creation error",
+            cause: createProductInfo({title, description, price, stock, category}),
+            message: "Error trying to create product",
+            code: EErrors.INVALID_TYPES_ERROR
+        })
+    }
 
     const result = await Product.create(newProduct);
 

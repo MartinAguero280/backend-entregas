@@ -14,6 +14,7 @@ import homeRouter from './routes/home.router.js';
 import productsRouter from './routes/products.router.js';
 import cartsRouter from './routes/carts.router.js';
 import sessionsRouter from './routes/sessions.router.js';
+import mockingProductsModel from "./routes/mockingproducts.js";
 // Models
 import { productModel } from "./dao/mongo/models/product.model.js";
 import { chatModel } from "./dao/mongo/models/chat.model.js";
@@ -27,6 +28,10 @@ import initializePassport from "./config/passport.config.js";
 import cookieParser from "cookie-parser";
 // Config
 import { port, mongoUri, sessionSecret, sessionName } from "./config/config.js";
+// Compression
+import compression from "express-compression";
+// Error Handler
+import errorHandler from "./middlewares/errors/error_middleware.js"
 
 
 
@@ -34,6 +39,8 @@ import { port, mongoUri, sessionSecret, sessionName } from "./config/config.js";
 const app = express();
 const httpServer = new HttpServer(app);
 const io = new IOserver(httpServer);
+
+app.use(compression());
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -67,12 +74,18 @@ app.use(express.static(__dirname + '/public'));
 app.use('/', homeRouter, productsRouter, cartsRouter);
 app.use('/sessions', sessionsRouter);
 app.use('/realtimeproducts', homeRouter);
+app.use('/mockingproducts', mockingProductsModel);
+
+
+// Error Handler
+app.use(errorHandler);
 
 
 //handlebars
 app.engine('handlebars', handlebars.engine());
 app.set('views', __dirname + '/views');
 app.set('view engine', 'handlebars');
+
 
 // Chat
 let messages = [];

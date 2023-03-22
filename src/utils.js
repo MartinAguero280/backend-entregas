@@ -9,6 +9,8 @@ import jwt from 'jsonwebtoken';
 import { jwtCookieName, jwtPrivateKey } from './config/config.js'
 // passport
 import passport from 'passport';
+// Faker
+import { faker } from '@faker-js/faker';
 
 
 // Ruta absoluta
@@ -93,4 +95,17 @@ export function getCreatedAt() {
     const now = new Date();
     return now;
 
+}
+
+// Faker generate products
+faker.locale = 'es'; // Idioma de datos
+export const generateProduct = () => {
+    return {
+        title: faker.commerce.productName(),
+        price: faker.commerce.price(),
+        department: faker.commerce.department(),
+        stock: faker.random.numeric(1),
+        id: faker.database.mongodbObjectId(),
+        image: faker.image.image()
+    }
 }
