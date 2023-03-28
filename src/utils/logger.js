@@ -19,11 +19,10 @@ const statusError = ()=> {
 }
 
 const statusFile = ()=> {
-    if (status === "desarrollo") return "";
-    if (status === "producción") return "error";
-    if (!status) return ""
+    if (status === "desarrollo") return true;
+    if (status === "producción") return false;
+    if (!status) return true
 }
-
 
 const logger = winston.createLogger({
     levels: customLevelsOptions.levels,
@@ -37,8 +36,8 @@ const logger = winston.createLogger({
 
         new winston.transports.File({
             filename: './errors.log',
-            silent: true,
-            level: statusFile(),
+            level: "error",
+            silent: statusFile(),
             format: winston.format.simple()
         })
     ]
