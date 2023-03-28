@@ -82,7 +82,6 @@ router.get("/api/carts/:id", passportCall('jwt'), async (req, res) => {
         res.send({status: "succes", cart})
 
     } catch (error) {
-        console.log(error);
         res.send({status: "error", error: "El carrito no fue encontrado"})
     }
 });

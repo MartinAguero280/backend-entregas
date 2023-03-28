@@ -33,7 +33,7 @@ router.post("/login", async (req, res, next) => {
     try {
         res.cookie(jwtCookieName, req.user.token).redirect("/products")
     } catch (error) {
-        console.log(error);
+        req.logger.error('Error al hacer login');
     }
 });
 
@@ -69,7 +69,7 @@ router.post("/register", async (req, res, next) => {
     try {
         res.redirect('/sessions/login')
     } catch (error) {
-        console.log('ERROR:', error);
+        req.logger.error('Error al hacer register')
     }
 });
 

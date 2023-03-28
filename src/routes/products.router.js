@@ -73,7 +73,7 @@ router.get("/products", passportCall('jwt'), async (req, res) => {
         res.render('products/products', result)
 
     } catch (error) { 
-        console.log("Error al traer los productos", error);
+        req.logger.error('Error al traer los productos');
     }
 });
 
@@ -103,7 +103,7 @@ router.post("/products/create",passportCall('jwt'), requireRole('admin'), async(
     res.redirect('/products');
 
     } catch (error) { 
-        console.log("Error al crear el producto", error);
+        req.logger.error('Error al crear el producto')
     }
 })
 
