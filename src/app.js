@@ -15,6 +15,7 @@ import productsRouter from './routes/products.router.js';
 import cartsRouter from './routes/carts.router.js';
 import sessionsRouter from './routes/sessions.router.js';
 import mockingProductsModel from "./routes/mockingproducts.js";
+import loggerTest from "./routes/loggerTest.router.js";
 // Models
 import { productModel } from "./dao/mongo/models/product.model.js";
 import { chatModel } from "./dao/mongo/models/chat.model.js";
@@ -32,6 +33,8 @@ import { port, mongoUri, sessionSecret, sessionName } from "./config/config.js";
 import compression from "express-compression";
 // Error Handler
 import errorHandler from "./middlewares/errors/error_middleware.js"
+// Loggers
+import { addLogger } from './utils/logger.js'
 
 
 
@@ -40,10 +43,15 @@ const app = express();
 const httpServer = new HttpServer(app);
 const io = new IOserver(httpServer);
 
+// Compression
 app.use(compression());
 
+// Express Json
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+
+// LLogers
+app.use(addLogger)
 
 // Cookie parser
 app.use(cookieParser());
@@ -72,6 +80,7 @@ app.use(passport.session());
 
 app.use(express.static(__dirname + '/public'));
 app.use('/', homeRouter, productsRouter, cartsRouter);
+app.use('/Loggertest', loggerTest);
 app.use('/sessions', sessionsRouter);
 app.use('/realtimeproducts', homeRouter);
 app.use('/mockingproducts', mockingProductsModel);

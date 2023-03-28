@@ -2,6 +2,9 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Status
+export const status = process.env.STATUS;
+
 // Persistence
 export const persistence = process.env.PERSISTENCE;
 

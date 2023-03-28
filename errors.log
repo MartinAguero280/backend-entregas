@@ -1,0 +1,19 @@
+info: GET en /loggertest - 17:38:57
+fatal: Testing FATAL ERROR
+error: Testing ERROR
+warning: Testing WARNING
+info: Testing INFO
+info: GET en /loggertest - 17:40:29
+fatal: Testing FATAL ERROR
+info: GET en /loggertest - 17:43:07
+info: GET en /loggertest - 17:48:13
+info: GET en /loggertest - 17:48:39
+info: GET en /loggertest - 17:51:34
+info: GET en /loggertest - 17:53:50
+info: GET en /loggertest - 17:55:08
+info: GET en /loggertest - 17:59:31
+info: GET en /loggertest - 18:02:20
+fatal: Testing FATAL ERROR
+error: Testing ERROR
+warning: Testing WARNING
+info: Testing INFO
