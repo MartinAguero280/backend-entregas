@@ -1,0 +1,189 @@
+paths:
+
+  # Ruta /api/products
+  /api/products:
+    # Get
+    get:
+      summary: Obtiene la api de productos
+      tags:
+        - Products
+      responses:
+        "200":
+          description: Los productos fueron devueltos correctamente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Product'
+        "500":
+          description: Error interno del server. Query defectuosa, un fallo a la conexion a la DB o simplemente no hay productos.
+    # Post
+    post: 
+      summary: Añade un nuevo producto
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/requestBodies/updateProduct'
+      responses:
+        "200":
+          description: El producto ah sido añadido correctamente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/StatusSuccess'
+        "500":
+          description: Error al añadir un producto.
+
+  # Ruta /api/products/:pOd
+  /api/products/{pId}:
+    # Get
+    get:
+      summary: Obtiene un product a partir de su ID
+      tags:
+        - Products
+      parameters:
+      - name: pId
+        in: path
+        required: true
+        description: ID del producto que se solicita
+        schema:
+          $type: string
+      responses:
+        "200":
+          description: Producto Encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Product'
+        "404":
+          description: Error al obtener un producto. El producto no fue encontrado.
+    # Put
+    put:
+      summary: Actualiza un producto a partir de su ID
+      tags:
+        - Products
+      parameters:
+      - name: pId
+        in: path
+        required: true
+        description: ID del producto que se solicita
+        schema:
+          $type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/requestBodies/updateProduct'
+      responses:
+        "200":
+          description: El producto ah sido actualizado exitosamente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Product'
+        "500":
+          description: Error al actualizar un producto.
+    # Delete
+    delete:
+      summary: Elimina un producto a partir de su ID
+      tags:
+        - Products
+      parameters:
+      - name: pId
+        in: path
+        required: true
+        description: ID del producto que se solicita
+      responses:
+        "200":
+          description: El producto ah sido eliminado exitosamente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Product'
+        "400":
+          description: Error al eliminar un producto. El producto que quiere elimimnar ya ha sido eliminado.
+        "500":
+          description: Error al eliminar un producto. El id que a introducido no coincide con ningun producto.
+
+# Components
+components:
+
+  # Schemas
+  schemas:
+    Product:
+      type: object
+      properties:
+        _id:
+          type: ObjectId
+          description: ID autogenerado en mongo
+        title:
+          type: string
+          description: Titulo del producto
+        description:
+          type: string
+          description: Descripcion del producto
+        price:
+          type: number
+          description: Precio del producto
+        code:
+          type: string
+          description: Codigo unico autogenerado conformado por números y letras
+        stock:
+          type: number
+          description: Stock del producto
+        status:
+          type: boolean
+          description: Estado segun el stock (true o false)
+        category:
+          type: string
+          description: Categoria del producto
+      example:
+        _id: "641a83dfba2c4da07668af12"
+        title: Auriculares inalambricos
+        description: Auriculares inalambricos color negro
+        price: 30
+        code: AmD
+        stock: 100
+        status: true
+        category: auriculares
+
+  # Request bodies
+  requestBodies:
+    updateProduct:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Titulo del producto
+        description:
+          type: string
+          description: Descripcion del producto
+        price:
+          type: number
+          description: Precio del producto
+        stock:
+          type: number
+          description: Stock del producto
+        category:
+          type: string
+          description: Categoria del producto
+      example:
+        title: Auriculares inalambricos
+        description: Auriculares inalambricos color negro
+        price: 30
+        stock: 100
+        category: auriculares
+
+tags: []

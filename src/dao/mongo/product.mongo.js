@@ -31,6 +31,10 @@ export default class ProductMongo {
         return await productModel.deleteOne(condition);
     }
 
+    updateOne = async (c, pU) => {
+        return await productModel.updateOne(c, pU)
+    }
+
     paginate = async(search, options) => {
         return await productModel.paginate(search, options);
     }

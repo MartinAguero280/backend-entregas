@@ -49,6 +49,12 @@ export default class ProductRepository {
         return result
     }
 
+    updateOne = async (c, pU) => {
+        const result = await this.dao.updateOne(c, pU);
+
+        return result
+    }
+
     paginate = async(search, options) => {
         const result = await this.dao.paginate(search, options);
 

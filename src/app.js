@@ -32,9 +32,12 @@ import { port, mongoUri, sessionSecret, sessionName } from "./config/config.js";
 // Compression
 import compression from "express-compression";
 // Error Handler
-import errorHandler from "./middlewares/errors/error_middleware.js"
+import errorHandler from "./middlewares/errors/error_middleware.js";
 // Loggers
-import { addLogger } from './utils/logger.js'
+import { addLogger } from './utils/logger.js';
+// Swagger
+import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerUiExpress from 'swagger-ui-express'
 
 
 
@@ -94,6 +97,21 @@ app.use(errorHandler);
 app.engine('handlebars', handlebars.engine());
 app.set('views', __dirname + '/views');
 app.set('view engine', 'handlebars');
+
+
+// Swagger options
+const swaggerOptions = {
+    definition: {
+        openapi: '3.0.1',
+        info: {
+            title: 'Documentacion de ManoniMotoRep tienda online',
+            description: 'Esta es la documentacion oficial de ManoniMotoRep tienda online'
+        }
+    },
+    apis: [`${__dirname}/docs/**/*.yaml`]
+}
+const specs = swaggerJSDoc(swaggerOptions);
+app.use('/apidocs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
 
 
 // Chat

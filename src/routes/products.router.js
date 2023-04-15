@@ -22,7 +22,7 @@ router.get("/api/products",passportCall('jwt'), async (req, res) => {
     try {
         const product = await Product.find();
 
-        res.send({status: "succes", product})
+        res.send({status: "success", product})
 
     } catch (error) {
         res.send({status: "error", error: "No hay productos"})
@@ -61,7 +61,7 @@ router.get("/products", passportCall('jwt'), async (req, res) => {
         const result = await Product.paginate(search, options);
 
         if (!result) {
-            res.send({ status: "succes", products: "No hay productos"})
+            res.send({ status: "success", products: "No hay productos"})
         }
 
         result.prevLink = result.hasPrevPage ? `/products?page=${result.prevPage}&limit=${limit}&query=${filter}&sort=${sort}` : "";
@@ -118,10 +118,10 @@ router.get("/api/products/:id",passportCall('jwt'), async (req, res) => {
 
         const product = await Product.find({_id: id});
 
-        res.send({status: "succes", product})
+        res.status(200).send({status: "success", product})
 
     } catch (error) {
-        res.send({status: "error", error: "El producto no fue encontrado"})
+        res.status(404).send({status: "error", error: "El producto no fue encontrado"})
     }
 });
 
@@ -132,10 +132,10 @@ router.post("/api/products",passportCall('jwt'), async (req, res) => {
         if (!newProduct) {
             return res.status(400).send({status: "error", error: "Valores incompletos"})
         }
-        res.send({status: "succes"})
+        res.status(200).send({status: "success"})
 
     } catch (error) {
-        res.send({status: "succes", error: "Error al agregar el producto"})
+        res.status(500).send({status: "error", error: "Error al agregar el producto"})
     }
 });
 
@@ -150,7 +150,7 @@ router.put("/api/products/:id",passportCall('jwt'), async (req, res) => {
         if (elementUpdated.length === undefined) {
             return res.status(400).send({status: "error", error: "Error al actualizar un producto"})
         }
-        res.send({status: "succes", result, product: elementUpdated})
+        res.status(200).send({status: "success", result, product: elementUpdated})
 
     } catch (error) {
         return res.status(400).send({status: "error", error: "Error al actualizar un producto"})
@@ -165,13 +165,13 @@ router.delete("/api/products/:id",passportCall('jwt'), async (req, res) => {
         const productDeleted = await Product.deleteOne({_id: id});
 
         if (productDeleted.length === undefined) {
-            return res.status(400).send({status: "error", error: "Error al eliminar un producto, el producto que quiere elimimnar ya ha sido eliminado"})
+            return res.status(400).send({status: "error", error: "Error al eliminar un producto. El producto que quiere elimimnar ya ha sido eliminado"})
         }
 
-        res.send({status: "succes", productDeleted: productDeleted})
+        res.status(200).send({status: "success", productDeleted: productDeleted})
 
     } catch (error) {
-        return res.status(400).send({status: "error", error: "Error al eliminar un producto, el id que a introducido no coincide con ningun producto"})
+        return res.status(400).send({status: "error", error: "Error al eliminar un producto. El id que a introducido no coincide con ningun producto"})
     }
 });
 

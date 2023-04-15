@@ -33,6 +33,10 @@ export default class ProductController {
         return this.ProductService.deleteOne(condition);
     }
 
+    updateOne = async (c, pU) => {
+        return this.ProductService.updateOne(c, pU);
+    }
+
     paginate = async(search, options) => {
         return this.ProductService.paginate(search, options)
     }

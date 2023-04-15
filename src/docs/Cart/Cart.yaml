@@ -1,0 +1,323 @@
+paths:
+
+  # Ruta /api/carts
+  /api/carts:
+    # Get
+    get:
+      summary: Obtiene la api de carritos
+      tags:
+        - Carts
+      responses:
+        "200":
+          description: Los carritos fueron devueltos correctamente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Product'
+        "500":
+          description: Error interno del server. Query defectuosa, un fallo a la conexion a la DB o simplemente no hay carritos.
+    # Post
+    post: 
+      summary: Crea un nuevo carrito
+      tags:
+        - Carts
+      responses:
+        "200":
+          description: El carrito ah sido creado correctamente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/StatusSuccess'
+        "500":
+          description: Error al crear un nuevo carrito.
+
+  # Ruta /api/carts/:cId
+  /api/carts/{cId}:
+    # Get
+    get:
+      summary: Obtiene un carrito a partir de su ID
+      tags:
+        - Carts
+      parameters:
+      - name: cId
+        in: path
+        required: true
+        description: ID del carrito que se solicita
+        schema:
+          $type: string
+      responses:
+        "200":
+          description: Carrito Encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Cart'
+        "404":
+          description: Error al obtener un carrito. El carrito no fue encontrado.
+    # Put
+    put:
+      summary: Actualiza un carrito forzosamente a partir de su ID
+      tags:
+        - Carts
+      parameters:
+      - name: cId
+        in: path
+        required: true
+        description: ID del carrito que se solicita
+        schema:
+          $type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/requestBodies/UpdateCart'
+      responses:
+        "200":
+          description: El carrito ah sido actualizado exitosamente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/UpdateCart'
+        "500":
+          description: Error al actualizar un carrito.
+    # Delete
+    delete:
+      summary: Elimina todos los productos de un carrito a partir de su ID
+      tags:
+        - Carts
+      parameters:
+      - name: cId
+        in: path
+        required: true
+        description: ID del carrito que se solicita
+      responses:
+        "200":
+          description: El carrito se a vaciado exitosamente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/UpdateCart'
+        "500":
+          description: Error al vaciar un carrito. Id del carrito o id del producto incorrectos.
+
+  # Ruta /api/carts/{cId}/product/{pId}
+  /api/carts/{cId}/product/{pId}:
+    # Post
+    post:
+      summary: Agrega un producto a partir de su ID a un carrito a partir de su ID
+      tags:
+        - Carts
+      parameters:
+      - name: cId
+        in: path
+        required: true
+        description: ID del carrito que se solicita
+        schema:
+          $type: string
+      - name: pId
+        in: path
+        required: true
+        description: ID del producto a agregar
+        schema:
+          $type: string
+      responses:
+        "200":
+          description: Producto agregado exitosamente a un carrito.
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/UpdateCart'
+        "400":
+          description: Error al agregar un producto a un carrito. Los id tienen que ser válidos.
+        "500":
+          description: Error al agregar un producto a un carrito. El producto o el carrito no fueron encontrados.
+    # Delete
+    delete:
+      summary: Elimina un producto a partir de su ID de un carrito a partir de su ID
+      tags:
+        - Carts
+      parameters:
+      - name: cId
+        in: path
+        required: true
+        description: ID del carrito que se solicita
+        schema:
+          $type: string
+      - name: pId
+        in: path
+        required: true
+        description: ID del producto a eliminar
+        schema:
+          $type: string
+      responses:
+        "200":
+          description: Producto eliminado exitosamente de un carrito.
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/UpdateCart'
+        "400":
+          description: Error al eliminar un producto de un carrito. Los id tienen que ser válidos.
+        "500":
+          description: Error al eliminar un producto de un carrito. El producto o el carrito no fueron encontrados.
+    # Put
+    put:
+      summary: Actualiza solo la cantidad de productos agregados a un carrito mediante sus ID
+      tags:
+        - Carts
+      parameters:
+      - name: cId
+        in: path
+        required: true
+        description: ID del carrito que se solicita
+        schema:
+          $type: string
+      - name: pId
+        in: path
+        required: true
+        description: ID del producto que se solicita
+        schema:
+          $type: string
+      responses:
+        "200":
+          description: Cantidad del producto solicitado actualizada exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/UpdateCart'
+        "500":
+          description: Error al actualizar la cantidad de un producto.
+        
+
+# Components
+components:
+  # Schemas
+  schemas:
+    # Cart
+    Cart:
+      type: object
+      properties:
+        _id:
+          type: ObjectId
+          description: ID autogenerado en mongo
+        products:
+          type: array
+          description: Productos agregados al carritos
+          items:
+            type: object
+            properties:
+              product:
+                type: ObjectId
+                description: ObjectId que hace referencia al id del producto agregado a traves de populate
+              quantity:
+                type: integer
+                description: Cantidad del producto
+              _id:
+                type: ObjectId
+                description: ID autogenerado en mongo
+      example:
+        __id: 63c9cd99fad6cc66f877ba4f
+        products:
+          - product:
+              _id: 63bed5ee6488356d88abff6b
+              title: ipad
+              description: tablet ipad
+              price: 1500
+              code: '567'
+              stock: 0
+              status: true
+              category: tablet
+              __v: 0
+            quantity: 3
+            _id: 64125e9145d68da78c44c574
+          - product:
+              _id: 63bf11232c35e9e62c0e54c4
+              title: iphone
+              description: phone apple
+              price: 1500
+              code: '046'
+              stock: 0
+              status: true
+              category: phone
+              __v: 0
+            quantity: 5
+            _id: 64125e9845d68da78c44c57b
+        __v: 0
+    # Cart add, delete and update quantity
+    UpdateCart:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Estado de la respuesta
+        result:
+          type: object
+          properties:
+            acknowledged:
+              type: boolean
+              description: Indica si la operación fue reconocida por MongoDB
+            modifiedCount:
+              type: integer
+              description: Número de documentos modificados
+            upsertedId:
+              type: string
+              description: ID del documento insertado cuando se utiliza la opción "upsert"
+            upsertedCount:
+              type: integer
+              description: Número de documentos insertados cuando se utiliza la opción "upsert"
+            matchedCount:
+              type: integer
+              description: Número de documentos que coinciden con los criterios de búsqueda
+      example:
+        status: success
+        result:
+          acknowledged: true
+          modifiedCount: 1
+          upsertedId: null
+          upsertedCount: 0
+          matchedCount: 1
+    # Status success
+    StatusSuccess:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Estado de la respuesta
+      example:
+        status: success
+
+  # Request bodies
+  requestBodies:
+    UpdateCart:
+      type: object
+      properties:
+        products:
+          type: array
+          description: Productos agregados al carritos
+          items:
+            type: object
+            properties:
+              product:
+                type: ObjectId
+                description: ObjectId que hace referencia al id del producto agregado a traves de populate
+              quantity:
+                type: integer
+                description: Cantidad del producto
+              _id:
+                type: ObjectId
+                description: ID autogenerado en mongo
+      example:
+        products:
+          - product: "63c847716ec5d0e6613e10f9"
+            quantity: 3
+
+tags: []

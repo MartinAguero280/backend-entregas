@@ -46,9 +46,9 @@ router.post("/api/carts", passportCall('jwt'), async (req, res) => {
 
 
     if (!newCart) {
-        return res.status(400).send({status: "error", error: "No se a podido agregar el carrito"})
+        return res.status(500).send({status: "error", error: "No se a podido agregar el carrito"})
     }
-    res.send({status: "succes"})
+    res.status(200).send({status: "success"})
 });
 
 // Mostrar todos los carritos
@@ -64,9 +64,9 @@ router.get("/api/carts", passportCall('jwt'), async (req, res) => {
 
         const carts = allCarts.slice(0, limit)
 
-        res.send({ carts })
+        res.status(200).send({ carts })
     } catch (error) {
-        console.log("Error al traer los carritos");
+        res.status(500).send({message:"Error al traer los carritos"}) ;
     }
 });
 
@@ -76,17 +76,17 @@ router.get("/api/carts/:id", passportCall('jwt'), async (req, res) => {
     try {
         const {id} = req.params;
 
-        const cart = await Cart.findOne({_id: id});
+        const cart = await Cart.find({_id: id}); 
         //console.log(JSON.stringify(cart, null, "\t"));
 
-        res.send({status: "succes", cart})
+        res.status(200).send({status: "success", cart})
 
     } catch (error) {
-        res.send({status: "error", error: "El carrito no fue encontrado"})
+        res.status(404).send({status: "error", error: "El carrito no fue encontrado"})
     }
 });
 
-// Agregar productos segun su id a los carritos segun su id
+// Agregar productos mediante su id a los carritos mediante su id
 router.post("/api/carts/:idc/product/:idp", passportCall('jwt'), async (req, res) => {
     try {
 
@@ -94,7 +94,7 @@ router.post("/api/carts/:idc/product/:idp", passportCall('jwt'), async (req, res
         const idp = req.params.idp;
 
         if (idc.length < 0 || idp.length < 0) {
-            return res.send({error: "Los id tienen que ser válidos"})
+            return res.status(400).send({error: "Los id tienen que ser válidos"})
         };
 
         const productById = await Product.find({_id: idp});
@@ -114,7 +114,7 @@ router.post("/api/carts/:idc/product/:idp", passportCall('jwt'), async (req, res
 
             const result = await Cart.replaceOne({_id: idc}, cartById[0])
 
-            return res.send({status: "succes", result})
+            return res.send({status: "success", result})
         }
 
         productById.quantity = 1;
@@ -123,14 +123,14 @@ router.post("/api/carts/:idc/product/:idp", passportCall('jwt'), async (req, res
 
         const result = await Cart.replaceOne({_id: idc}, cartById[0])
 
-        res.send({status: "succes", result})
+        res.status(200).send({status: "success", result})
 
     } catch (error) {
-        res.send({status: "error", error: "id de carrito o id de producto incorrectos"})
+        res.send({status: "error", error: "Error al agregar un producto a un carrito. El producto o el carrito no fueron encontrado."})
     }
 });
 
-// Eliminar productos segun su id del carrito seleccionado segun su id
+// Eliminar productos mediante id del carrito seleccionado mediante su id
 router.delete("/api/carts/:idc/product/:idp", passportCall('jwt'), async (req, res) => {
     try {
         const {idc, idp} = req.params;
@@ -145,14 +145,14 @@ router.delete("/api/carts/:idc/product/:idp", passportCall('jwt'), async (req, r
 
         const result = await Cart.updateOne({_id: idc}, {$set: {products: newproducts}})
 
-        res.send({status: "succes", result})
+        res.send({status: "success", result})
 
     } catch (error) {
         res.send({status: "error", error: "id de carrito o id de producto incorrectos"})
     }
 });
 
-// Actualizar un carrito forsosamente por lo que contenga el body
+// Actualizar un carrito forzosamente por lo que contenga el body
 router.put("/api/carts/:id", passportCall('jwt'), async (req, res) => {
 
     try {
@@ -162,7 +162,7 @@ router.put("/api/carts/:id", passportCall('jwt'), async (req, res) => {
 
         const result = await Cart.updateOne({_id: id}, elementUpdated);
 
-        res.send({status: "succes", result})
+        res.send({status: "success", result})
     } catch (error) {
         res.send({error: "Error al actualizar el carrito"})
     }
@@ -172,7 +172,7 @@ router.put("/api/carts/:id", passportCall('jwt'), async (req, res) => {
 router.put("/api/carts/:idc/product/:idp", passportCall('jwt'), async (req, res) => {
 
     try {
-
+        console.log("recien empiesa");
         const { idp, idc } = req.params;
 
         const quantityUpdated = req.body.quantity;
@@ -191,10 +191,11 @@ router.put("/api/carts/:idc/product/:idp", passportCall('jwt'), async (req, res)
 
         const result = await Cart.updateOne({_id: idc}, {$set: {products: products}})
 
-        res.send({status: "succes", result})
+        res.send({status: "success", result})
 
 
     } catch (error) {
+        console.log("falló");
         res.send({status: "error", error: "Error al actualizar el quantity de un producto dentro de un carrito"})
     }
 });
@@ -210,11 +211,10 @@ router.delete("/api/carts/:id", passportCall('jwt'), async (req, res) => {
         
         const result = await Cart.updateOne({_id: id}, { $set: { products: [] }});
 
-
-        res.send({status: "succes", result})
+        res.status(200).send({status: "success", result})
 
     } catch (error) { 
-        res.send({status: "error", error: "id de carrito o id de producto incorrectos"})
+        res.status(500).send({status: "error", error: "id del carrito o id del producto incorrectos"})
     }
 
 });
@@ -305,10 +305,10 @@ router.post("/carts/:id/purchase", passportCall('jwt'), async( req, res) => {
         })
 
         if (productsRegected.length > 0) {
-            return res.send({status:'succes', messsage:'Falta de stock en los siguientes productos', products: productsWithoutStock})
+            return res.send({status:'success', messsage:'Falta de stock en los siguientes productos', products: productsWithoutStock})
         }
 
-        res.send({status: "succes", message: 'Compra realizada exitosamente'})
+        res.send({status: "success", message: 'Compra realizada exitosamente'})
 
     } catch (error) {
         res.send({error: 'Ocurrio un error al realizar la compra'})
