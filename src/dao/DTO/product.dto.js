@@ -10,6 +10,7 @@ export default class ProductDTO {
         this.stock = product.stock || 0
         this.status = product.stock > 0 ? true : false
         this.category = product.category || ''
+        this.owner = product.owner || 'admin'
 
         this.active = true
     }

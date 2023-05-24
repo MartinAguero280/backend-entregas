@@ -2,7 +2,7 @@
 import passport from 'passport';
 import local from 'passport-local';
 // Utils
-import { encryptPassword, comparePassword, generateToken, authToken} from '../utils.js';
+import { encryptPassword, comparePassword, generateToken, authToken, getCreatedAt} from '../utils.js';
 // Github
 import GitHubStrategy from 'passport-github2';
 // JWT
@@ -11,7 +11,10 @@ import jwt from 'passport-jwt';
 import { jwtCookieName, jwtPrivateKey, githubClientId, githubClientSecret, githubCallBackUrl, adminEmail, adminPassword } from '../config/config.js'
 // Controller
 import UserController from '../controllers/user.controller.js';
+import CartController from '../controllers/cart.controller.js';
+
 const User = new UserController();
+const Cart = new CartController();
 
 
 const localStrategy = local.Strategy;
@@ -31,21 +34,30 @@ const initializePassport = () => {
 
             try {
 
-                const user = await User.findOne({email: username});// cambio
+                const user = await User.findOne({email: username});
                 if (user) {
                     return done('Usuario ya existe', false)
                 }
+
+                const cart = {
+                    products: [
+                        
+                    ],
+                }
+                
+                const newCart = await Cart.create({cart});
 
                 const newUser = {
                     first_name: name,
                     last_name: lastname,
                     age,
                     email: username,
-                    password: encryptPassword(password)
+                    password: encryptPassword(password),
+                    cart: newCart.id
                 }
 
-                const result = await User.create(newUser);// cambio
-
+                const result = await User.create(newUser);
+                
                 return done(null, result)
 
             } catch (error) {
@@ -59,7 +71,7 @@ const initializePassport = () => {
         async(username, password, done) => {
             try {
 
-                const user = await User.findOne({email: username});//cambio
+                const user = await User.findOne({email: username});
                 if (!user) {
                     return done('Usuario no registrado', false)
                 }
@@ -69,6 +81,8 @@ const initializePassport = () => {
                 }
 
                 user.token = generateToken(user);
+                User.updateOne({email: username}, { $set: { last_connection: getCreatedAt() }});
+
 
                 return done(null, user)
 
@@ -108,13 +122,9 @@ const initializePassport = () => {
             clientSecret: githubClientSecret,
             callbackURL: githubCallBackUrl
         },
-        async(accessToken, refreshToken, profile, done) => {
-
-            
+        async(accessToken, refreshToken, profile, done) => { 
 
             try {
-
-                profile._json.email = 'perro@perro.com';
 
                 const user = await User.findOne({email: profile._json.email});
 

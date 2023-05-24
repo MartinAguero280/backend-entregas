@@ -1,9 +1,9 @@
 import express from "express";
-import { passportCall } from "../utils.js";
+import { requireRole } from "../utils.js";
 
 const router = express.Router();
 
-router.get('/', passportCall('jwt'), async (req, res) => { 
+router.get('/', requireRole('user', 'premium'), async (req, res) => { 
 
     req.logger.fatal('Testing FATAL ERROR')
     req.logger.error('Testing ERROR')

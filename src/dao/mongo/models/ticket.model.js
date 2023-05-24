@@ -6,7 +6,7 @@ const ticketCollection = 'tickets';
 // Esquema del documento
 const ticketSchema = new mongoose.Schema({
     code: String,
-    purchase_datetime: String,
+    purchase_datetime: Date,
     amount: Number,
     purchaser: String
 

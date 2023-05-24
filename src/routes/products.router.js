@@ -2,8 +2,8 @@
 import express from "express";
 // Model
 import { productModel } from "../dao/mongo/models/product.model.js";
-// jwt auth
-import { requireRole, passportCall } from "../utils.js";
+// Require role
+import { requireRole } from "../utils.js";
 // Product controller
 import ProductController from "../controllers/product.controller.js";
 // Custom Errors
@@ -18,72 +18,56 @@ const Product = new ProductController();
 // Products
 
 // Api products
-router.get("/api/products",passportCall('jwt'), async (req, res) => {
+router.get("/api/products", requireRole('user', 'premium'), async (req, res) => {
     try {
         const product = await Product.find();
 
-        res.send({status: "success", product})
+        res.status(200).send({status: "success", product})
 
     } catch (error) {
-        res.send({status: "error", error: "No hay productos"})
+        res.status(500).send({status: "error", error: "No hay productos"})
     }
 });
 
 // View Products
-router.get("/products", passportCall('jwt'), async (req, res) => {
+router.get("/products", requireRole('user', 'premium'), async (req, res) => {
 
     try {
 
-        const page = req.query?.page || 1;
-        const limit = req.query?.limit || 10;
-        const filter = req.query?.query || "";
-        const sort = req.query?.sort || "";
-        const search = {};
-        const options = {page, limit, lean: true};
+        const result = await Product.productsPaginate(req, res);
 
-        if (filter) {
-            search["$or"] = [
-                {category: {$regex: filter}},
-                {title: {$regex: filter}},
-            ]
-        }
-
-        if (sort) {
-            if (sort == "asc") {
-                const result = await Product.paginate({}, { sort:{ price: 1 } });
-                return res.send({ result })
-            }else if (sort == "desc") {
-                const result = await Product.paginate({}, { sort:{ price: 1 } });
-                return res.send({ result })
-            }
-        };
-
-        const result = await Product.paginate(search, options);
-
-        if (!result) {
-            res.send({ status: "success", products: "No hay productos"})
-        }
-
-        result.prevLink = result.hasPrevPage ? `/products?page=${result.prevPage}&limit=${limit}&query=${filter}&sort=${sort}` : "";
-        result.nextLink = result.hasNextPage ? `/products?page=${result.nextPage}&limit=${limit}&query=${filter}&sort=${sort}` : "";
-        result.isValid = !(page <= 0 || page > result.totalPages || isNaN(page));
-        result.user = req.user.user;
-        result.admin = req.user.user.role === 'admin';
-
-        res.render('products/products', result)
+        return res.status(200).render('products/products', result)
 
     } catch (error) { 
-        req.logger.error('Error al traer los productos');
+        return res.status(500).send({status: 'error', error: 'Error al traer los productos'});
+    }
+});
+
+// Manage Products
+router.get("/products/manage", requireRole('premium'), async (req, res) => {
+
+    try {
+
+        const productsPaginate = await Product.productsPaginate(req, res);
+
+        if (productsPaginate.noResult) {
+            return res.status(200).send({ status: "success", message: "No hay productos"})
+        }
+
+        return res.status(200).render('products/manageProducts', result)
+
+    } catch (error) { 
+        res.status(500).send({status: 'error', error: 'Error al traer los productos'})
     }
 });
 
 // View create Product
-router.get("/products/create", passportCall('jwt'), requireRole('admin'), async(req, res) => {
+router.get("/products/create", requireRole('premium'), async(req, res) => {
     res.render('products/createProducts');
 });
 
 // Create Product
-router.post("/products/create",passportCall('jwt'), requireRole('admin'), async(req, res) => {
+router.post("/products/create", requireRole('premium'), async(req, res) => {
     try {
 
     const newProduct = req.body;
@@ -98,17 +82,25 @@ router.post("/products/create",passportCall('jwt'), requireRole('admin'), async(
         })
     }
 
+    
+    if (req.user.user.role === 'premium') {
+        newProduct.owner = req.user.user.email;
+        const result = await Product.create(newProduct);
+
+        return res.redirect('/products');
+    }
+
     const result = await Product.create(newProduct);
 
-    res.redirect('/products');
+    return res.status(200).redirect('/products');
 
     } catch (error) { 
-        req.logger.error('Error al crear el producto')
+        res.status(500).res({status: 'error', error: 'Error al crear el producto'})
     }
 })
 
 // Mostrar un producto segun su id
-router.get("/api/products/:id",passportCall('jwt'), async (req, res) => {
+router.get("/api/products/:id", requireRole('user', 'premium'), async (req, res) => {
     try {
         const {id} = req.params;
 
@@ -118,29 +110,30 @@ router.get("/api/products/:id",passportCall('jwt'), async (req, res) => {
 
         const product = await Product.find({_id: id});
 
-        res.status(200).send({status: "success", product})
+        return res.status(200).send({status: "success", product})
 
     } catch (error) {
-        res.status(404).send({status: "error", error: "El producto no fue encontrado"})
+        return res.status(404).send({status: "error", error: "El producto no fue encontrado"})
     }
 });
 
 // Agregar un nuevo producto
-router.post("/api/products",passportCall('jwt'), async (req, res) => {
+router.post("/api/products", requireRole('premium'), async (req, res) => {
     try {
         const newProduct = await Product.create(req.body);
         if (!newProduct) {
             return res.status(400).send({status: "error", error: "Valores incompletos"})
         }
-        res.status(200).send({status: "success"})
+
+        return res.status(200).send({status: "success"})
 
     } catch (error) {
-        res.status(500).send({status: "error", error: "Error al agregar el producto"})
+        return res.status(500).send({status: "error", error: "Error al agregar el producto"})
     }
 });
 
 // Actualizar un producto segun su id
-router.put("/api/products/:id",passportCall('jwt'), async (req, res) => {
+router.put("/api/products/:id", requireRole('admin'), async (req, res) => {
     try {
         const {id} = req.params;
 
@@ -158,21 +151,36 @@ router.put("/api/products/:id",passportCall('jwt'), async (req, res) => {
 });
 
 // Eliminar un producto segund su id
-router.delete("/api/products/:id",passportCall('jwt'), async (req, res) => {
-    try {
-        const {id} = req.params;
+router.delete("/api/products/:id", requireRole('premium'), async (req, res) => {
 
+    try {
+
+        const {id} = req.params;
+        const productOwner = req.query.productOwner;
+
+        if (req.user.user.role !== 'admin') {
+            if (req.user.user.email !== productOwner) {
+                return res.status(500).send({status: 'error', error: 'No puede eliminar un producto que no ha creado'})
+            }
+        }
+        const product = await Product.findOne({_id: id});
+        
         const productDeleted = await Product.deleteOne({_id: id});
 
         if (productDeleted.length === undefined) {
-            return res.status(400).send({status: "error", error: "Error al eliminar un producto. El producto que quiere elimimnar ya ha sido eliminado"})
+            return res.status(500).send({status: "error", error: "Error al eliminar un producto"})
         }
 
-        res.status(200).send({status: "success", productDeleted: productDeleted})
+        if (productOwner !== 'admin') {
+            const emailDeleteProduct = Product.emailDeleteProduct(product)
+        }
+
+        return res.status(200).send({status: "success", productDeleted: productDeleted})
 
     } catch (error) {
-        return res.status(400).send({status: "error", error: "Error al eliminar un producto. El id que a introducido no coincide con ningun producto"})
+        return res.status(500).send({status: "error", error: "Error al eliminar un producto"})
     }
+
 });
 
 export default router

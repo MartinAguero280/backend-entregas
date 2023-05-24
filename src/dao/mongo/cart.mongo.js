@@ -27,4 +27,8 @@ export default class CartMongo {
         return await cartModel.updateOne(condition, object)
     }
 
+    deleteOne = async (condition) => {
+        return await cartModel.deleteOne(condition)
+    }
+
 }

@@ -12,10 +12,10 @@ export default class TicketRepository {
         return result
     }
 
-    create = async (u) => {
-        const ticketToInsert = new TicketDTO(u);
+    create = async (t) => {
+        const ticketToInsert = new TicketDTO(t);
         const result = await this.dao.create(ticketToInsert);
-
+        
         return result
     }
 

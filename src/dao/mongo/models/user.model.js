@@ -19,13 +19,14 @@ const usersSchema = new mongoose.Schema({
     age: Number,
     password: String,
     cart: {
-        type: Array,
+        type: mongoose.Schema.Types.ObjectId,
         default: []
     },
     role: {
         type: String,
         default: 'user'
-    }
+    },
+    last_connection: Date
 
 });
 

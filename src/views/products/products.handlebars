@@ -1,10 +1,19 @@
 {{#if isValid}}
 <div>
     <h2>Products</h2>
-    <h3>Bienvenido <a href="/sessions/current"> {{user.first_name}} </a>, su rol es: {{user.role}} </h3><i><a href="/sessions/logout"><button type="button" class="btn btn-danger">Logout</button></a></i>
-    {{#if admin}}
+    <h3>Bienvenido <a href="/sessions/current"> {{user.first_name}} </a>, su rol es {{user.role}} </h3><i><a href="/sessions/logout"><button type="button" class="btn btn-danger">Logout</button></a></i>
+    {{#if accessToCreateProducts}}
     <i><a href="/products/create"><button type="button" class="btn btn-primary">Create Product</button></a></i>
     {{/if}}
+    {{#if accessToCreateProducts}}
+    <i><a href="/products/manage"><button type="button" class="btn btn-primary">Manage Products</button></a></i>
+    {{/if}}
+    {{#if adminAccess}}
+    <i><a href="/users"><button type="button" class="btn btn-primary">Manage Users</button></a></i>
+    {{/if}}
+    {{#ifUnequals user.role 'admin' }}
+    <i><a href="/carts/{{user.cart}}"><button type="button" class="btn btn-primary">Cart</button></a></i>
+    {{/ifUnequals}}
     <hr>
 
     <div>
@@ -21,37 +30,35 @@
         </nav>
     </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="cool">Title</th>
-                <th scope="cool">Description</th>
-                <th scope="cool">Price</th>
-                <th scope="cool">Code</th>
-                <th scope="cool">Stock</th>
-                <th scope="cool">Status</th>
-                <th scope="cool">Category</th>
-                <th scope="cool">button</th>
-            </tr>
-        </thead>
+    <div class="row">
+        {{#each docs}}
+        <div class="col-sm-4"  style="display: flex; align-items: center; justify-content: center;">
+            <div class="card my-4" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">{{this.title}}</h5>
+                    <p class="card-text">{{this.description}}</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Price: {{this.price}}</li>
+                    <li class="list-group-item">Stock: {{this.stock}}</li>
+                    <li class="list-group-item">Category: {{this.category}}</li>
+                </ul>
+                
+                {{#ifUnequals ../user.role 'admin' }}
+                <div class="card-body">
+                    {{#ifUnequals ../user.email this.owner }}
+                    <button id="AddToCartButton" class="btn btn-primary addToCartButton" data-product-id="{{this._id}}" data-cart-id="{{../user.cart}}" >Añadir al carrito</button> 
+                    {{/ifUnequals}}
+                </div>
+                {{/ifUnequals}}
+            </div>
+        </div>
+        {{/each}}
+    </div>
 
-        <tbody>
-            {{#each docs}}
-            <tr>
-                <th scope="row"> {{this.title}} </th>
-                <th> {{this.description}} </th>
-                <th> {{this.price}} </th>
-                <th> {{this.code}} </th>
-                <th> {{this.stock}} </th>
-                <th> {{this.status}} </th>
-                <th> {{this.category}} </th>
-                <th> <button id="AddToCartButton" class="btn btn-primary">Add to cart</button> </th>
-            </tr>
-            {{/each}}
-        </tbody>
-
-    </table>
 </div>
 {{else}}
 <h2>No Products</h2>
 {{/if}}
+
+<script src="/js/products.js"></script>

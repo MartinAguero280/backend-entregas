@@ -43,5 +43,11 @@ export default class CartRepository {
         return result
     }
 
+    deleteOne = async (condition) => {
+        const result = await this.dao.deleteOne(condition);
+
+        return result
+    }
+
 
 }

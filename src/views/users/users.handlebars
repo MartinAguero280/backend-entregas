@@ -1,0 +1,51 @@
+
+<h1>Manage users</h1>
+
+<table class="table">
+        <thead>
+            <tr>
+                <th scope="cool">first_name</th>
+                <th scope="cool">last_name</th>
+                <th scope="cool">email</th>
+                <th scope="cool">age</th>
+                <th scope="cool">role</th>
+                <th scope="cool"></th>
+            </tr>
+        </thead>
+
+        <tbody class="tbodyProducts">
+            {{#each users}}
+                <tr>
+                    <th scope="row"> {{this.first_name}} </th>
+                    <th> {{this.last_name}} </th>
+                    <th> {{this.email}} </th> 
+                    <th> {{this.age}} </th>
+                    <th> 
+                        {{#ifUnequals this.role "admin" }}
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {{this.role}}
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><button class="dropdown-item userdropDownButton" data-new-role-user="user" data-user-id="{{this._id}}" data-user-role="{{this.role}}" >User</button></li>
+                                <li><button class="dropdown-item userdropDownButton" data-new-role-user="premium" data-user-id="{{this._id}}" data-user-role="{{this.role}}" >Premium</button></li>
+                            </ul>
+                        </div>
+                        {{/ifUnequals}}
+                        {{#ifEquals this.role "admin" }}
+                        {{this.role}}
+                        {{/ifEquals}}
+                    </th>
+                    <th>
+                        {{#ifUnequals this.role "admin" }}
+                        <button class="btn btn-danger deleteUserButton" data-user-id="{{this._id}}" data-user-role="{{this.role}}" data-user-cart="{{this.cart}}" >Delete</button>
+                        {{/ifUnequals}}
+                    </th>
+                </tr>
+            {{/each}}
+        </tbody>
+
+    </table>
+</div>
+
+<script src="/js/user.js"></script>

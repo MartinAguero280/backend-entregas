@@ -1,37 +1,51 @@
+{{#ifUnequals cartTotalPrice 0 }}
+    <h1>Carrito</h1>
 
-<h1>Carrito segun el id ingresado</h1>
 
-<table class="table">
-        <thead>
-            <tr>
-                <th scope="cool">Title</th>
-                <th scope="cool">Description</th>
-                <th scope="cool">Price</th>
-                <th scope="cool">Code</th>
-                <th scope="cool">Stock</th>
-                <th scope="cool">Status</th>
-                <th scope="cool">Category</th>
-                <th scope="cool">Quantity</th>
-            </tr>
-        </thead>
-
-        <tbody class="tbodyProducts">
-            {{#each products}}
-                {{#with product}}
+    <table class="table">
+            <thead>
                 <tr>
-                    <th scope="row"> {{title}} </th>
-                    <th> {{description}} </th>
-                    <th> {{price}} </th> 
-                    <th> {{code}} </th>
-                    <th> {{stock}} </th>
-                    <th> {{status}} </th>
-                    <th> {{category}} </th>
-                {{/with}}
-                    <th> {{this.quantity}} </th>
+                    <th scope="cool">Title</th>
+                    <th scope="cool">Description</th>
+                    <th scope="cool">Price</th>
+                    <th scope="cool">Code</th>
+                    <th scope="cool">Stock</th>
+                    <th scope="cool">Status</th>
+                    <th scope="cool">Category</th>
+                    <th scope="cool">Quantity</th>
+                    <th scope="cool"></th>
                 </tr>
-                
-            {{/each}}
-        </tbody>
+            </thead>
 
-    </table>
-</div>
+            <tbody class="tbodyProducts">
+                {{#each products}}
+                    {{#with product}}
+                    <tr>
+                        <th scope="row"> {{title}} </th>
+                        <th> {{description}} </th>
+                        <th> {{price}} </th> 
+                        <th> {{code}} </th>
+                        <th> {{stock}} </th>
+                        <th> {{status}} </th>
+                        <th> {{category}} </th>
+                        <th> {{../this.quantity}} </th>
+                        <th>
+                            <button class="btn btn-danger deleteProductInCartButton" data-cart-id="{{../../cartId}}" data-product-id="{{_id}}" >Delete</button>
+                        </th>
+                    </tr>
+                    {{/with}}
+                    
+                {{/each}}
+            </tbody>
+
+        </table>
+        <h3>Total: {{cartTotalPrice}}</h3>
+        <i><button id="purchaseCartButton" type="button" class="btn btn-primary" data-cart-id="{{cartId}}" >Purchase cart</button></i>
+        <i><button id="deleteCartButton" type="button" class="btn btn-danger" data-cart-id="{{cartId}}" >Delete CArt</button></i>
+    </div>
+{{/ifUnequals}}
+{{#ifEquals cartTotalPrice 0}}
+<h1>Cart</h1>
+<h3>El Carrito esta vacío</h3>
+{{/ifEquals}}
+<script src="/js/carts.js"></script>

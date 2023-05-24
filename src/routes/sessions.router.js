@@ -5,7 +5,7 @@ import passport from "passport";
 // JWT
 import { jwtCookieName } from '../config/config.js'
 // Passport call
-import { requireRole, passportCall } from "../utils.js";
+import { requireRole, comparePassword} from "../utils.js";
 // DTO
 import UserDTO from "../dao/DTO/user.dto.js";
 
@@ -28,6 +28,9 @@ router.post("/login", async (req, res, next) => {
     if (!email || !password) {
         return res.status(400).render('errors/error', { error: 'Usuario y contraseña son requeridos' });
     };
+    if (!comparePassword(password, password)) {
+        return res.status(400).render('errors/error', { error: 'Usuario y/o contraseña incorrectos' });
+    }
     next();
 }, passport.authenticate('login', { failureDirect: 'sessions/faillogin' }), async (req, res) => {
     try {
@@ -80,7 +83,7 @@ router.get("/failregister", async (req, res) => {
 
 
 // Current
-router.get("/current", passportCall('jwt'), requireRole('user'), async (req, res) => {
+router.get("/current", requireRole('user', 'premium'), async (req, res) => {
     const user = new UserDTO(req.user.user);
     res.render('sessions/current', { user })
 })
@@ -88,13 +91,7 @@ router.get("/current", passportCall('jwt'), requireRole('user'), async (req, res
 
 //Logout
 router.get("/logout", async (req, res) => {
-
-    /*req.session.destroy(err => {
-        if (!err) res.redirect("/sessions/login")
-        else res.render("errors/error", {error: "Error al hacer logout"})
-    });*/
-
-    res.clearCookie(jwtCookieName).redirect('login');
+    return res.clearCookie(jwtCookieName).redirect('login');
 })
 
 

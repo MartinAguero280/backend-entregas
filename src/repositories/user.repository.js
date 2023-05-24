@@ -8,7 +8,6 @@ export default class UserRepository {
 
     find = async () => {
         const result = await this.dao.find();
-
         return result
     }
 
@@ -21,13 +20,26 @@ export default class UserRepository {
 
     findOne = async (c) => {
         const result = await this.dao.findOne(c);
-
         return result
     }
 
     findById = async (id) => {
         const result = await this.dao.findById(id);
+        return result
+    }
 
+    updateOne = async (...c) => {
+        const result = await this.dao.updateOne(...c);
+        return result
+    }
+
+    deleteMany = async (...c) => {
+        const result = await this.dao.deleteMany(...c);
+        return result
+    }
+
+    deleteOne = async (...c) => {
+        const result = await this.dao.deleteOne(...c);
         return result
     }
 

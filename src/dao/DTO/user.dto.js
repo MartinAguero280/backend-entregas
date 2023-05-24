@@ -1,3 +1,5 @@
+import { getCreatedAt } from "../../utils.js";
+
 export default class UserDTO {
 
     constructor(user) {
@@ -8,6 +10,7 @@ export default class UserDTO {
         this.password = user.password || ''
         this.cart = user.cart || []
         this.role = user.role || 'user'
+        this.last_connection = this.last_connection || getCreatedAt()
 
         this.active = true
     }

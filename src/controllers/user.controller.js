@@ -20,4 +20,17 @@ export default class UserController {
     findById = async (id) => {
         return this.UserService.findById(id)
     }
+
+    updateOne = async (...c) => {
+        return this.UserService.updateOne(...c)
+    }
+
+    deleteMany = async (...c) => {
+        return this.UserService.deleteMany(...c)
+    }
+
+    deleteOne = async (...c) => {
+        return this.UserService.deleteOne(...c)
+    }
+
 }

@@ -7,8 +7,7 @@ import { Server as IOserver} from 'socket.io'
 import { __dirname } from "./utils.js";
 // Handlebars
 import handlebars from 'express-handlebars';
-// Mongoose
-import mongoose from "mongoose";
+import Handlebars from 'handlebars';
 // Routers
 import homeRouter from './routes/home.router.js';
 import productsRouter from './routes/products.router.js';
@@ -16,6 +15,7 @@ import cartsRouter from './routes/carts.router.js';
 import sessionsRouter from './routes/sessions.router.js';
 import mockingProductsModel from "./routes/mockingproducts.js";
 import loggerTest from "./routes/loggerTest.router.js";
+import usersRouter from './routes/users.router.js'
 // Models
 import { productModel } from "./dao/mongo/models/product.model.js";
 import { chatModel } from "./dao/mongo/models/chat.model.js";
@@ -41,6 +41,8 @@ import swaggerUiExpress from 'swagger-ui-express'
 
 
 
+
+
 // Express
 const app = express();
 const httpServer = new HttpServer(app);
@@ -53,11 +55,13 @@ app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-// LLogers
+// Loggers
 app.use(addLogger)
 
 // Cookie parser
 app.use(cookieParser());
+
+
 
 // Express session 
 app.use(session({
@@ -68,7 +72,7 @@ app.use(session({
             useNewUrlParser: true,
             useUnifiedTopology: true
         },
-        ttl: 100
+        ttl: 1
     }),
     secret: sessionSecret,
     resave: true,
@@ -82,7 +86,7 @@ app.use(passport.session());
 
 
 app.use(express.static(__dirname + '/public'));
-app.use('/', homeRouter, productsRouter, cartsRouter);
+app.use('/', homeRouter, productsRouter, cartsRouter, usersRouter);
 app.use('/Loggertest', loggerTest);
 app.use('/sessions', sessionsRouter);
 app.use('/realtimeproducts', homeRouter);
@@ -93,10 +97,17 @@ app.use('/mockingproducts', mockingProductsModel);
 app.use(errorHandler);
 
 
-//handlebars
+// Handlebars
 app.engine('handlebars', handlebars.engine());
 app.set('views', __dirname + '/views');
 app.set('view engine', 'handlebars');
+// Helper handlebars
+Handlebars.registerHelper('ifUnequals', function(arg1, arg2, options) {
+    return (arg1 !== arg2) ? options.fn(this) : options.inverse(this);
+});
+Handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
+    return (arg1 === arg2) ? options.fn(this) : options.inverse(this);
+});
 
 
 // Swagger options
@@ -104,8 +115,8 @@ const swaggerOptions = {
     definition: {
         openapi: '3.0.1',
         info: {
-            title: 'Documentacion de ManoniMotoRep tienda online',
-            description: 'Esta es la documentacion oficial de ManoniMotoRep tienda online'
+            title: 'Documentacion de Ecommerce BackEnd',
+            description: 'Esta es la documentacion oficial de Ecommerce BackEnd'
         }
     },
     apis: [`${__dirname}/docs/**/*.yaml`]
@@ -133,16 +144,6 @@ io.on("connection", async socket => {
         chatModel.create(data)
     })
 })
-
-
-// Coneccion a DB Mongo Atlas
-mongoose.set('strictQuery', false);
-mongoose.connect(mongoUri, error => {
-    if (error) {
-        console.error("No se pudo conectar a la base de datos", error);
-        process.exit()
-    }
-});
 
 
 const server = httpServer.listen(port, () => console.log(`server running on port ${port}`));

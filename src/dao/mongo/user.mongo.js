@@ -8,7 +8,7 @@ export default class UserMongo {
     }
 
     find = async () => {
-        return userModel.find();
+        return userModel.find().lean();
     }
 
     findOne = async (u) => {
@@ -18,5 +18,18 @@ export default class UserMongo {
     findById = async (id) => {
         return userModel.findById(id)
     }
+
+    updateOne = async (...c) => {
+        return userModel.updateOne(...c)
+    }
+
+    deleteMany = async (...c) => {
+        return userModel.deleteMany(...c)
+    }
+
+    deleteOne = async (...c) => {
+        return userModel.deleteOne(...c)
+    }
+
 }
 

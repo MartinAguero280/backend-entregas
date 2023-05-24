@@ -13,16 +13,11 @@ import passport from 'passport';
 import { faker } from '@faker-js/faker';
 
 
+
 // Ruta absoluta
 const __filename = fileURLToPath(import.meta.url);
 export const __dirname = dirname(__filename)
 
-// Authentication function
-export function auth(req, res, next) {
-    if (req.session?.user) return next();
-
-    return res.status(401).render("errors/error", {error: "No autenticado, logueate para ver esta página"})
-}
 
 // bcrypt
 // Hashear password
@@ -47,7 +42,7 @@ export const authToken = (req, res, next) => {
     if (!authToken) return res.status(401).render('errors/error', {error: 'the token does not exist'});
     jwt.verify(token, jwtPrivateKey, (error, credentials) => {
         if (error) return res.status(401).render('errors/error', {error: 'Username does not exist'});
-        req.user = credentials.user;
+        req.user = {...user};
         next()
     })
 }
@@ -57,8 +52,6 @@ export const passportCall = (strategy) => {
     return async (req, res, next) => {
         passport.authenticate(strategy, function(err, user, info) {
             if (err) return next(err);
-            if (!user) return res.status(401).render('errors/error', {error: info.message ? info.messages : info.toString()})
-
             req.user = user;
             next()
         })(req, res, next)
@@ -66,17 +59,34 @@ export const passportCall = (strategy) => {
 }
 
 // role authorization system
-export function requireRole(role) {
-    return (req, res, next) => {
+export function requireRole(...role) {
+    return [
+        passportCall('jwt'),
+        (req, res, next) => {
 
-    if (req.user.user.role === 'admin') {
-        return next();
-    }
-    if (!req.user.user || req.user.user.role !== role) {
-        return res.status(401).render('errors/error', {error: 'You do not have access to this page'});
-    }
-    return next();
-    };
+        try {
+
+            if (!req.user.user) {
+                return res.status(401).redirect('/sessions/login')
+            }
+
+            const isAdmin = req.user.user.role === 'admin';
+            if (isAdmin) return next()
+
+            const differentRole = role.every(role => role !== req.user.user.role)
+            if (differentRole) {
+                return res.status(401).render('errors/error',{error: `No tienes acceso a esta página`})
+            }
+
+            const equalRole = role.includes(req.user.user.role)
+            if (equalRole) return next();
+
+            return next();
+
+        } catch (error) {
+            res.status(500).send({error: 'Error role'})
+        }
+    }];
 }
 
 // Generate random string function
@@ -94,7 +104,6 @@ export function generateRandomString() {
 export function getCreatedAt() {
     const now = new Date();
     return now;
-
 }
 
 // Faker generate products
