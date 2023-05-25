@@ -137,45 +137,46 @@ export default class CartController {
 
         const cartUpdated = await CartService.updateOne({_id: idc}, {$set: {products: productsWithoutStock}})
 
-        // const transport = nodemailer.createTransport({
-        //     service: 'gmail',
-        //     port: 587,
-        //     auth: {
-        //         user: 'mail admin',
-        //         pass: 'pass'
-        //     }
-        // })
+        // Falta gamil and password para que funcione
+        const transport = nodemailer.createTransport({
+            service: 'gmail',
+            port: 587,
+            auth: {
+                user: 'mail admin',
+                pass: 'pass'
+            }
+        })
 
-        // const mail = await transport.sendMail({
-        //     from: 'mail admin',
-        //     to: req.user.user.email,
-        //     subject: 'BackEnd ecommerce',
-        //     html: `
-        //         <div>
-        //             <h1>BackEnd ecommerce</h1>
+        const mail = await transport.sendMail({
+            from: 'mail admin',
+            to: req.user.user.email,
+            subject: 'BackEnd ecommerce',
+            html: `
+                <div>
+                    <h1>BackEnd ecommerce</h1>
 
-        //             <h2>Gracias por su compra ${createTicket.purchaser}</h2>
+                    <h2>Gracias por su compra ${createTicket.purchaser}</h2>
 
-        //             <h3>Ticket de compra</h3>
+                    <h3>Ticket de compra</h3>
 
                     
-        //             <h4>Productos:</h4>
-        //             <ul>
-        //                 ${productsWithStock.map(product => `<li>Nombre: ${product.product.title} - Precio: $${product.product.price} - Cantidad: ${product.quantity}</li>`).join("")}
-        //             </ul>
-        //             <h4>Total: $${createTicket.amount} </h4>
+                    <h4>Productos:</h4>
+                    <ul>
+                        ${productsWithStock.map(product => `<li>Nombre: ${product.product.title} - Precio: $${product.product.price} - Cantidad: ${product.quantity}</li>`).join("")}
+                    </ul>
+                    <h4>Total: $${createTicket.amount} </h4>
 
-        //             <h4>Productos que no se pudieron comprar por falta de stock:</h4>
-        //             ${productsWithoutStock.length > 0 ? 
-        //                 `<ul>
-        //                     ${productsWithoutStock.map(product => `<li>Nombre: ${product.product.title} - Precio: $${product.product.price} - Cantidad: ${product.quantity}</li>`).join("")}
-        //                 </ul>` :
-        //                 `<p>No hay productos sin stock.</p>`
-        //             }
-        //         </div>
-        //     `,
-        //     attachments: []
-        // })
+                    <h4>Productos que no se pudieron comprar por falta de stock:</h4>
+                    ${productsWithoutStock.length > 0 ? 
+                        `<ul>
+                            ${productsWithoutStock.map(product => `<li>Nombre: ${product.product.title} - Precio: $${product.product.price} - Cantidad: ${product.quantity}</li>`).join("")}
+                        </ul>` :
+                        `<p>No hay productos sin stock.</p>`
+                    }
+                </div>
+            `,
+            attachments: []
+        })
 
         if (productsRegected.length > 0) {
             return {productsWithoutStock: productsWithoutStock}

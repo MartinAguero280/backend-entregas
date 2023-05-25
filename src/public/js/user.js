@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const userId = event.target.dataset.userId;
             const userRole = event.target.dataset.userRole
             const userCart = event.target.dataset.userCart
-            console.log(userId, userRole, userCart);
 
             fetch(`/api/users/${userId}?userRole=${userRole}&userCart=${userCart}`, {
                     method: 'DELETE'

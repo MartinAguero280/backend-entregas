@@ -71,7 +71,7 @@ export default class ProductController {
             const result = await ProductService.paginate(search, options);
 
             if (!result) {
-                return {noResult: result}
+                return result
             }
 
             result.prevLink = result.hasPrevPage ? `/products?page=${result.prevPage}&limit=${limit}&query=${filter}&sort=${sort}` : "";

@@ -48,16 +48,12 @@ router.get("/products/manage", requireRole('premium'), async (req, res) => {
 
     try {
 
-        const productsPaginate = await Product.productsPaginate(req, res);
-
-        if (productsPaginate.noResult) {
-            return res.status(200).send({ status: "success", message: "No hay productos"})
-        }
+        const result = await Product.productsPaginate(req, res);
 
         return res.status(200).render('products/manageProducts', result)
 
     } catch (error) { 
-        res.status(500).send({status: 'error', error: 'Error al traer los productos'})
+        return res.status(500).send({status: 'error', error: 'Error al traer los productos'});
     }
 });
 

@@ -25,19 +25,23 @@ router.get("/login", async (req, res) => {
 // Login
 router.post("/login", async (req, res, next) => {
     const { email, password } = req.body;
+
     if (!email || !password) {
         return res.status(400).render('errors/error', { error: 'Usuario y contraseña son requeridos' });
     };
-    if (!comparePassword(password, password)) {
-        return res.status(400).render('errors/error', { error: 'Usuario y/o contraseña incorrectos' });
+
+    passport.authenticate('login', { failureRedirect: 'sessions/faillogin' }, (error, user) => {
+    if (error) {
+        return res.status(500).render('errors/error', {error});
     }
-    next();
-}, passport.authenticate('login', { failureDirect: 'sessions/faillogin' }), async (req, res) => {
-    try {
-        res.cookie(jwtCookieName, req.user.token).redirect("/products")
-    } catch (error) {
-        req.logger.error('Error al hacer login');
-    }
+    req.logIn(user, (error) => {
+        if (error) {
+        return res.status(500).render('errors/error', {error});
+        }
+
+        return res.cookie(jwtCookieName, req.user.token).redirect("/products");
+    });
+    })(req, res, next);
 });
 
 // Fail login

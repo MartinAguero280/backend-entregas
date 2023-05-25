@@ -72,17 +72,17 @@ const initializePassport = () => {
             try {
 
                 const user = await User.findOne({email: username});
+
                 if (!user) {
                     return done('Usuario no registrado', false)
                 }
 
                 if (!comparePassword(password, user.password)) {
-                    return done('La contraseña es incorrecta', false)
+                    return done('Usuario y/o contraseña incorrectos', false)
                 }
 
                 user.token = generateToken(user);
                 User.updateOne({email: username}, { $set: { last_connection: getCreatedAt() }});
-
 
                 return done(null, user)
 

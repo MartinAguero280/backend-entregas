@@ -4,11 +4,10 @@ import express from "express";
 import { requireRole } from "../utils.js";
 // Controllers
 import CartController from "../controllers/cart.controller.js";
-import ProductController from "../controllers/product.controller.js";
+
 
 const router = express.Router();
 const Cart = new CartController;
-const Product = new ProductController;
 
 
 // Cart 
@@ -27,7 +26,7 @@ router.get("/carts/:id", requireRole('user', 'premium'), async (req, res) => {
         const productsInCartById = cartById[0].products;
         const cartTotalPrice = await Cart.cartTotalPrice(cartById);
 
-        return res.status(200).render("carts", {products: productsInCartById, cartId: idc, cartTotalPrice});
+        return res.status(200).render("carts/carts", {products: productsInCartById, cartId: idc, cartTotalPrice});
     } catch (error) {
         return res.status(500).render('errors/error', {error: "Error al ver el carrito"})
     }
