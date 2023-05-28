@@ -15,7 +15,7 @@ import cartsRouter from './routes/carts.router.js';
 import sessionsRouter from './routes/sessions.router.js';
 import mockingProductsModel from "./routes/mockingproducts.js";
 import loggerTest from "./routes/loggerTest.router.js";
-import usersRouter from './routes/users.router.js'
+import usersRouter from './routes/users.router.js';
 // Models
 import { productModel } from "./dao/mongo/models/product.model.js";
 import { chatModel } from "./dao/mongo/models/chat.model.js";
@@ -37,7 +37,7 @@ import errorHandler from "./middlewares/errors/error_middleware.js";
 import { addLogger } from './utils/logger.js';
 // Swagger
 import swaggerJSDoc from 'swagger-jsdoc';
-import swaggerUiExpress from 'swagger-ui-express'
+import swaggerUiExpress from 'swagger-ui-express';
 
 
 

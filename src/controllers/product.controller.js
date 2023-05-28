@@ -1,5 +1,8 @@
 import { ProductService } from "../repositories/index.js";
+// Nodemailer
 import nodemailer from 'nodemailer'
+// Config
+import { emailNodeMailer, passwordNodeMailer } from "../config/config.js";
 
 export default class ProductController {
     constructor() {
@@ -92,15 +95,15 @@ export default class ProductController {
             service: 'gmail',
             port: 587,
             auth: {
-                user: 'mail admin',
-                pass: 'pass'
+                user: emailNodeMailer,
+                pass: passwordNodeMailer
             }
         })
 
         const mail = await transport.sendMail({
-            from: 'mail admin',
-            to: req.user.user.email,
-            subject: 'ManoniMotoRep Tienda Online',
+            from: emailNodeMailer,
+            to: product.owner,
+            subject: 'BackEnd ecommerce',
             html: `
                 <div>
                     <h1>BackEnd ecommerce</h1>

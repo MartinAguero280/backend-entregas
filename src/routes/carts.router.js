@@ -1,9 +1,11 @@
 // Express
 import express from "express";
-// jwt auth
+// Require role
 import { requireRole } from "../utils.js";
 // Controllers
 import CartController from "../controllers/cart.controller.js";
+// Sweetalert2
+import Swal from 'sweetalert2';
 
 
 const router = express.Router();
@@ -95,7 +97,7 @@ router.post("/api/carts/:idc/product/:idp", requireRole('user', 'premium'), asyn
         const idc = req.params.idc;
         const idp = req.params.idp;
 
-        if (idc.length < 0 || idp.length < 0) {
+        if (!idc || !idp) {
             return res.status(500).send({status: 'error', error: "Los id tienen que ser válidos"})
         };
 
@@ -206,17 +208,17 @@ router.post("/carts/:id/purchase", requireRole('user', 'premium'), async( req, r
         const cartPurchase = await Cart.purchaseCart(idc, cartById, req);
 
         if (cartPurchase.total !== undefined && cartPurchase.productsWithoutStock !== undefined) {
-            return res.send({status: "error", error: 'No se pudo realizar la compra por falta de stock en los siguientes productos', products: productsWithoutStock})
+            return res.send({status: "error", title: 'No se pudo realizar la compra', message: `No se pudo realizar la compra por falta de stock en todos los productos seleccionados`, icon: 'error'})
         }
 
         if (cartPurchase.productsWithoutStock !== undefined && cartPurchase.total === undefined) {
-            return res.send({status:'success', messsage:'Falta de stock en los siguientes productos', products: productsWithoutStock})
+            return res.send({status:'success', title: '¡Compra completada!', messsage:`Gracias por su compra. Hubo falta de stock en algunos productos. Se enviara un correo a ${req.user.user.email} con más informacion de la compra.`, icon: 'success'})
         }
 
-        return res.status(200).send({status: "success", message: 'Compra realizada exitosamente'})
+        return res.send({status:'success', title: '¡Compra completada!', message:`Gracias por su compra. Se enviara un correo a ${req.user.user.email} con más informacion de la compra.`, icon: 'success'})
 
     } catch (error) {
-        return res.status(500).send({error: 'Ocurrio un error al realizar la compra'})
+        res.status(500).send({status:'error', title: 'Error', message:'No se a podido completar la compra.', icon: 'error'})
     }
 
 })

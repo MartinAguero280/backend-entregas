@@ -4,8 +4,8 @@ import express from "express";
 import passport from "passport";
 // JWT
 import { jwtCookieName } from '../config/config.js'
-// Passport call
-import { requireRole, comparePassword} from "../utils.js";
+// Require role
+import { requireRole } from "../utils.js";
 // DTO
 import UserDTO from "../dao/DTO/user.dto.js";
 
@@ -50,15 +50,6 @@ router.get("/faillogin", async (req, res) => {
 });
 
 
-// // Login Github
-// router.get('/login-github', passport.authenticate('github', {scope: ['user: email']}), async(req, res) => {})
-// // Github callback
-// router.get('/githubcallback', passport.authenticate('github', {failureRedirect: '/login'}), async(req, res) => {
-
-//     res.cookie(jwtCookieName, req.user.token).redirect("/products")
-
-// })
-
 // Login Github
 router.get('/login-github', (req, res, next) => {
     passport.authenticate('github', { scope: ['user:email'] })(req, res, next);
@@ -87,16 +78,26 @@ router.get("/register", async (req, res) => {
 // Register
 router.post("/register", async (req, res, next) => {
     const { name, lastname, age, email, password } = req.body;
+
     if (!name || !lastname || !age || !email || !password) {
         return res.status(400).render('errors/error', { error: 'Todos los campos son requeridos' });
-    };
-    next();
-}, passport.authenticate('register', { failureDirect: '/sessions/failregister' }), async (req, res) => {
-    try {
-        res.redirect('/sessions/login')
-    } catch (error) {
-        req.logger.error('Error al hacer register')
     }
+
+    next();
+}, (req, res, next) => {
+    passport.authenticate('register', (error, user) => {
+        if (error) {
+            return res.status(500).render('errors/error', { error });
+        }
+        
+        req.logIn(user, (error) => {
+            if (error) {
+                return res.status(500).render('errors/error', { error });
+            }
+            
+            return res.redirect('/sessions/login');
+        });
+    })(req, res, next);
 });
 
 // Fail register

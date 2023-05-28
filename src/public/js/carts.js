@@ -6,8 +6,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             fetch(`/carts/${cartId}/purchase`, {
                     method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    Swal.fire({
+                        title: data.title,
+                        text: data.message,
+                        icon: data.icon,
+                        confirmButtonText: 'Aceptar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            return location.reload()
+                        }
+                    });
                 });
-                location.reload()
+
     });
 
 
@@ -35,4 +48,5 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 location.reload()
     });
+
 });

@@ -126,8 +126,6 @@ const initializePassport = () => {
 
             try {
 
-                console.log('gitHubCallbackURL:', githubCallBackUrl);
-
                 const user = await User.findOne({email: profile._json.email});
 
                 if (user) {
@@ -135,7 +133,7 @@ const initializePassport = () => {
                     return done(null, user)
                 };
 
-                if (profile._json.email && profile._json.name === null) {
+                if (profile._json.email || profile._json.name === null) {
                     return done('No se ha podido iniciar sesion debido a que en su cuenta de GitHub no tiene publico los atributos name y email', false)
                 }
 

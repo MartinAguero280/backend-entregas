@@ -4,6 +4,8 @@ import nodemailer from 'nodemailer'
 // Controllers
 import ProductController from "../controllers/product.controller.js";
 import TicketController from "../controllers/ticket.controller.js"
+// Config
+import { emailNodeMailer, passwordNodeMailer } from "../config/config.js";
 
 const Product = new ProductController;
 const Ticket = new TicketController;
@@ -137,18 +139,17 @@ export default class CartController {
 
         const cartUpdated = await CartService.updateOne({_id: idc}, {$set: {products: productsWithoutStock}})
 
-        // Falta gamil and password para que funcione
         const transport = nodemailer.createTransport({
             service: 'gmail',
             port: 587,
             auth: {
-                user: 'mail admin',
-                pass: 'pass'
+                user: emailNodeMailer,
+                pass: passwordNodeMailer
             }
         })
 
         const mail = await transport.sendMail({
-            from: 'mail admin',
+            from: emailNodeMailer,
             to: req.user.user.email,
             subject: 'BackEnd ecommerce',
             html: `

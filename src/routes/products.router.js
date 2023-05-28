@@ -163,12 +163,8 @@ router.delete("/api/products/:id", requireRole('premium'), async (req, res) => {
         
         const productDeleted = await Product.deleteOne({_id: id});
 
-        if (productDeleted.length === undefined) {
-            return res.status(500).send({status: "error", error: "Error al eliminar un producto"})
-        }
-
         if (productOwner !== 'admin') {
-            const emailDeleteProduct = Product.emailDeleteProduct(product)
+            const emailDeleteProduct = await Product.emailDeleteProduct(product)
         }
 
         return res.status(200).send({status: "success", productDeleted: productDeleted})

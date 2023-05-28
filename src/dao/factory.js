@@ -35,15 +35,15 @@ switch (persistence) {
 
     case 'file':
         console.log('Persistence with files');
-        const { default: UserFile } = await import('./managers/UserManager.js');
-        User = UserFile
+        // const { default: UserFile } = await import('./managers/UserManager.js');
+        // User = UserFile
 
         break
 
     default:
         console.log('Memory Persistence');
-        const { default: UserMemory } = await import('./memory/user.memory.js');
-        User = UserMemory
+        // const { default: UserMemory } = await import('./memory/user.memory.js');
+        // User = UserMemory
 
         break
 }

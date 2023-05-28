@@ -36,3 +36,7 @@ export const githubOwnedBy = process.env.OWNED_BY;
 export const githubAppId = process.env.APP_ID;
 export const githubClientId = process.env.CLIENT_ID;
 export const githubClientSecret = process.env.CLIENT_SECRET;
+
+// Nodemailer
+export const emailNodeMailer = process.env.EMAIL_NODEMAILER;
+export const passwordNodeMailer = process.env.PASSWORD_NODEMAILER;
