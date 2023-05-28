@@ -122,7 +122,7 @@ const initializePassport = () => {
             clientSecret: githubClientSecret,
             callbackURL: githubCallBackUrl
         },
-        async(accessToken, refreshToken, profile, done) => { 
+        async(accessToken, refreshToken, profile, done) => {  
 
             try {
 
@@ -133,26 +133,34 @@ const initializePassport = () => {
                     return done(null, user)
                 };
 
-                user = {
+                const cart = {
+                    products: [
+                        
+                    ],
+                }
+                
+                const newCart = await Cart.create({cart});
+
+                const userGitHub = {
                     first_name: profile._json.name,
                     last_name: '',
                     age: '',
                     email: profile._json.email,
                     password: '',
+                    cart: newCart.id
                 };
 
-                const result = await User.create(user);
+                const result = await User.create(userGitHub);
 
-                user.token = generateToken(user);
+                userGitHub.token = generateToken(userGitHub);
 
-                return done(null, user)
+                return done(null, userGitHub)
 
             } catch (error) {
                 return done('Error al loguearse con Github' + error)
             }
         }
     ))
-
 
 
     passport.serializeUser((user, done) => {
