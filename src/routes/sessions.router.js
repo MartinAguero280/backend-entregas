@@ -50,14 +50,33 @@ router.get("/faillogin", async (req, res) => {
 });
 
 
+// // Login Github
+// router.get('/login-github', passport.authenticate('github', {scope: ['user: email']}), async(req, res) => {})
+// // Github callback
+// router.get('/githubcallback', passport.authenticate('github', {failureRedirect: '/login'}), async(req, res) => {
+
+//     res.cookie(jwtCookieName, req.user.token).redirect("/products")
+
+// })
+
 // Login Github
-router.get('/login-github', passport.authenticate('github', {scope: ['user: email']}), async(req, res) => {})
+router.get('/login-github', (req, res, next) => {
+    passport.authenticate('github', { scope: ['user:email'] })(req, res, next);
+});
 // Github callback
-router.get('/githubcallback', passport.authenticate('github', {failureRedirect: '/login'}), async(req, res) => {
-
-    res.cookie(jwtCookieName, req.user.token).redirect("/products")
-
-})
+router.get('/githubcallback', (req, res, next) => {
+    passport.authenticate('github', { failureRedirect: '/login' }, (error, user) => {
+        if (error) {
+            return res.status(500).render('errors/error', { error });
+        }
+        req.logIn(user, (error) => {
+            if (error) {
+                return res.status(500).render('errors/error', { error });
+            }
+            return res.cookie(jwtCookieName, req.user.token).redirect("/products");
+        });
+    })(req, res, next);
+});
 
 
 // View register
