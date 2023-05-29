@@ -133,9 +133,10 @@ const initializePassport = () => {
                     return done(null, user)
                 };
 
-                if (profile._json.email && profile._json.name === null) {
-                    return done('No se ha podido iniciar sesion debido a que en su cuenta de GitHub no tiene publico los atributos name y email', false)
-                }
+                // if (profile._json.email || profile._json.name == null) {
+                //     console.log('profile: ', profile, ' email: ', profile._json.email, ' name: ', profile._json.name);
+                //     return done('No se ha podido iniciar sesion debido a que en su cuenta de GitHub no tiene publico los atributos name y email', false)
+                // }
 
                 const cart = {
                     products: [
@@ -145,7 +146,7 @@ const initializePassport = () => {
                 
                 const newCart = await Cart.create({cart});
 
-                const gitHubUser = {
+                const userGitHub = {
                     first_name: profile._json.name,
                     last_name: '',
                     age: '',
@@ -154,11 +155,11 @@ const initializePassport = () => {
                     cart: newCart.id
                 };
 
-                const result = await User.create(gitHubUser);
+                const result = await User.create(userGitHub);
 
-                result.token = generateToken(result);
+                userGitHub.token = generateToken(userGitHub);
 
-                return done(null, result)
+                return done(null, userGitHub)
 
             } catch (error) {
                 return done('Error al loguearse con Github' + error)
@@ -168,7 +169,7 @@ const initializePassport = () => {
 
 
     passport.serializeUser((user, done) => {
-        done(null, user._id)
+        done(null,user._id)
     })
     passport.deserializeUser(async (id, done) => {
         const user = await User.findById(id);

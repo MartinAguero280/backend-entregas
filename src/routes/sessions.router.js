@@ -58,7 +58,7 @@ router.get('/login-github', (req, res, next) => {
 router.get('/githubcallback', (req, res, next) => {
     passport.authenticate('github', { failureRedirect: '/login' }, (error, user) => {
         if (error) {
-            return res.status(500).render('errors/error', { error });
+            console.log('error de arriba', error);
         }
         req.logIn(user, (error) => {
             if (error) {
